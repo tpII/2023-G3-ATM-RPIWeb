@@ -1,0 +1,2 @@
+# Software del ATM en Raspberry Pi
+En este directorio se encuentra el programa que implementa la lógica de los periféricos conectados al microcontrolador, como así también la comunicación con el servidor.
