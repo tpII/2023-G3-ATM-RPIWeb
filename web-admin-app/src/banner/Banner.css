@@ -1,0 +1,44 @@
+.banner {
+    background-color: rgb(236, 236, 48);
+    padding: 8px 20px;
+    display: flex;
+    flex-direction: row;
+    gap: 50px;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    align-items: center;
+}
+
+.banner a {
+    text-decoration: none;
+    color: black;
+}
+
+.banner .home-btn {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    font-weight: 500;
+    font-size: large;
+}
+
+.banner-right {
+    position: fixed;
+    right: 10px;
+    display: flex;
+    flex-direction: row-reverse;
+    gap: 80px;
+    align-items: center;
+}
+
+.banner-right .user-btn {
+    display: flex;
+    flex-direction: row-reverse;
+    gap: 10px;
+}
+
+.theme-switcher {
+    cursor: pointer;
+}
