@@ -21,11 +21,12 @@ function App() {
 
   return (
     <div className="App">
-      {/* Contenido siempre visible */}
-      <Banner darkMode={darkMode} switchModeFn={switchMode} />
-    
-      {/* Contenido según ruta */}
+
+      {/* Todos los componentes que usen Link deben
+      estar contenidos en BrowserRouter */}
       <BrowserRouter>
+        <Banner darkMode={darkMode} switchModeFn={switchMode} />
+
         <Routes>
           <Route path='/' element={<HomePage/>} />
         </Routes>
