@@ -10,6 +10,7 @@ import iconDark from './moon.svg'
 function Banner(props) {
     return (
         <div className="banner">
+            
             <a className="home-btn" href="/">
                 <img src={atm} alt="Logo" width="45px"/>
                 <p>Tablero de control web</p>

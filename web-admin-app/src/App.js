@@ -2,6 +2,10 @@ import { useEffect, useState } from 'react';
 import './App.css';
 import Banner from './banner/Banner';
 
+// rutas
+import {BrowserRouter, Route, Routes} from 'react-router-dom'
+import HomePage from './home/HomePage';
+
 function App() {
 
   // Estados
@@ -17,7 +21,16 @@ function App() {
 
   return (
     <div className="App">
+      {/* Contenido siempre visible */}
       <Banner darkMode={darkMode} switchModeFn={switchMode} />
+    
+      {/* Contenido según ruta */}
+      <BrowserRouter>
+        <Routes>
+          <Route path='/' element={<HomePage/>} />
+        </Routes>
+      </BrowserRouter>
+      
     </div>
   );
 }
