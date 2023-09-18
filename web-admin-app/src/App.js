@@ -17,6 +17,8 @@ function App() {
   // Modificación de estilo al cambiar estado
   useEffect(() => {
     document.body.style.backgroundColor = darkMode ? '#282c34' : '#FFFFFF';
+    document.documentElement.style.setProperty('--dark', darkMode ? '#282c34' : '#FFFFFF');
+    document.documentElement.style.setProperty('--light', !darkMode ? '#282c34' : '#FFFFFF');
   }, [darkMode])
 
   return (

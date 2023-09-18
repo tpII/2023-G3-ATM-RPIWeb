@@ -1,19 +1,48 @@
+.home {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.home h1 {
+  color: var(--light);
+  text-align: start;
+  margin-left: 40px;
+}
+
 .main-buttons {
-    margin: 10%;
     display: flex;
     flex-direction: row;
     justify-content: center;
+    margin-left: 5%;
+    margin-right: 5%;
     gap: 10%;
   }
   
 .main-buttons a {
-  background-color: yellow;
+  background-color: var(--primary);
   text-decoration: none;
   color: black;
   text-align: center;
-  line-height: 80px;
   font-weight: 600;
   font-size: large;
-  width: 40%;
-  border-radius: 5%;
+  min-width: 20%;
+  border-radius: 10px;
+  display: flex;
+  padding: 20px;
+}
+
+.main-buttons a .card-info {
+  display: flex;
+  flex-direction: column;
+  line-height: normal;
+  align-items: flex-start;
+  margin-left: 20px;
+  min-width: 80px;
+}
+
+.main-buttons a .card-info .card-quantity {
+  font-size: xx-large;
+  font-weight: 700;
 }
