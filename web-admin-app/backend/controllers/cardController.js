@@ -1,5 +1,5 @@
 // Importar modelo
-const model = require('../models/user');
+const model = require('../models/card');
 
 // Definir controlador (funciones disponibles)
 const controller = {

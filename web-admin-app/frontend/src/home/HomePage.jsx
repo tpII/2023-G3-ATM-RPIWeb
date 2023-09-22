@@ -8,13 +8,25 @@ import swap_horiz from "./swap_horiz.svg";
 import { useEffect, useState } from "react";
 
 function HomePage() {
-  const [userCount, setUserCount] = useState(0)
+  const [userCount, setUserCount] = useState(0);
+  const [cardCount, setCardCount] = useState(0);
+  const [moveCount, setMoveCount] = useState(0);
 
   useEffect(() => {
     // Obtener cantidades desde la database
     fetch("http://127.0.0.1:2000/api/users/count")
-      .then(res => res.json())
+      .then((res) => res.json())
       .then((data) => setUserCount(data.count))
+      .catch((err) => console.error("Error: ", err));
+
+    fetch("http://127.0.0.1:2000/api/cards/count")
+      .then((res) => res.json())
+      .then((data) => setCardCount(data.count))
+      .catch((err) => console.error("Error: ", err));
+
+    fetch("http://127.0.0.1:2000/api/moves/count")
+      .then((res) => res.json())
+      .then((data) => setMoveCount(data.count))
       .catch((err) => console.error("Error: ", err));
   }, []);
 
@@ -22,7 +34,6 @@ function HomePage() {
     <main className="home">
       <h1>Dashboard</h1>
       <div className="main-buttons">
-
         <DashboardCard
           url="/users"
           name="Usuarios"
@@ -36,7 +47,7 @@ function HomePage() {
           name="Tarjetas"
           icon={credit_card}
           color="#ffcccc"
-          count={0}
+          count={cardCount}
         />
 
         <DashboardCard
@@ -44,9 +55,8 @@ function HomePage() {
           name="Transacciones"
           icon={swap_horiz}
           color="#ccffcc"
-          count={0}
+          count={moveCount}
         />
-
       </div>
     </main>
   );

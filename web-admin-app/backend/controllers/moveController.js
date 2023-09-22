@@ -1,5 +1,5 @@
 // Importar modelo
-const model = require('../models/user');
+const model = require('../models/move');
 
 // Definir controlador (funciones disponibles)
 const controller = {

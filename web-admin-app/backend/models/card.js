@@ -1,12 +1,13 @@
 const mongoose = require('mongoose')
+const ObjectId = mongoose.Schema.ObjectId
 
 // Definición de esquemas (campos de los documentos)
 const schema = new mongoose.Schema({
-  name: String,
-  email: String,
+  userId: ObjectId,
+  lastNumbers: Number
 });
 
 // Crea un modelo a partir del esquema
-const User = mongoose.model("User", schema);
+const Card = mongoose.model("Tarjeta", schema);
 
-module.exports = User;
+module.exports = Card;
