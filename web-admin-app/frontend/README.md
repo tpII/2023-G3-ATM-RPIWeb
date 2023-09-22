@@ -1,5 +1,5 @@
-# Software del Tablero de Control Web
-Corresponde a la interfaz disponible para el administrador del cajero ATM. Frontend desarrollado con React.
+# Frontend del Tablero de Control Web
+Corresponde a la interfaz disponible para el administrador del cajero ATM. Desarrollado en ReactJS.
 
 ## Dependencias
 En el repositorio se encuentra el código fuente sin el directorio node_modules. Ejecutar el comando `npm install` para instalarlas localmente.
