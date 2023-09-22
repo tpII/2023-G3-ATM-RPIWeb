@@ -11,10 +11,17 @@ Para conectarse a la base de datos de MongoDB, se debe correr el siguiente coman
 
 También puede ejecutar el archivo run.bat, en el presente directorio.
 
+![image](https://github.com/tpII/2023-G3-ATM-RPIWeb/assets/66924320/b45bb551-f0f2-4be0-b3db-42ca2a17825e)
+
+
 ## Troubleshoot
-En caso de no reconocerse el comando nodemon, instalarlo globalmente: ````npm i -g nodemon``
+En caso de no reconocerse el comando nodemon, instalarlo globalmente: ```npm i -g nodemon```
 
 ## API Routes
 Se definieron las siguientes rutas para consultas
 
 * api/users/count: devuelve el número de usuarios registrados.
+* api/cards/count: devuelve el número de tarjetas registradas.
+* api/moves/count: devuelve el número de transacciones registradas.
+
+Esquema formal de cada modelo sujeto a modificaciones.
