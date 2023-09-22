@@ -11,9 +11,9 @@ function HomePage() {
     <main className="home">
       <h1>Dashboard</h1>
       <div className="main-buttons">
-        <DashboardCard url="/users" name="Usuarios" icon={face} />
-        <DashboardCard url="/cards" name="Tarjetas" icon={credit_card} />
-        <DashboardCard url="/moves" name="Transacciones" icon={swap_horiz} />
+        <DashboardCard url="/users" name="Usuarios" icon={face} color="#ccccff" />
+        <DashboardCard url="/cards" name="Tarjetas" icon={credit_card} color="#ffcccc" />
+        <DashboardCard url="/moves" name="Transacciones" icon={swap_horiz} color="#ccffcc" />
       </div>
     </main>
   );

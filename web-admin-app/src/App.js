@@ -17,8 +17,16 @@ function App() {
   // Modificación de estilo al cambiar estado
   useEffect(() => {
     document.body.style.backgroundColor = darkMode ? '#282c34' : '#FFFFFF';
-    document.documentElement.style.setProperty('--dark', darkMode ? '#282c34' : '#FFFFFF');
-    document.documentElement.style.setProperty('--light', !darkMode ? '#282c34' : '#FFFFFF');
+
+    if (darkMode){
+      document.documentElement.style.setProperty('--dark', '#282c34');
+      document.documentElement.style.setProperty('--light', '#FFFFFF');
+      document.documentElement.style.setProperty('--gray', 'gray');
+    } else {
+      document.documentElement.style.setProperty('--light', '#282c34');
+      document.documentElement.style.setProperty('--dark', '#FFFFFF');
+      document.documentElement.style.setProperty('--gray', '#d9d4d4');
+    }
   }, [darkMode])
 
   return (

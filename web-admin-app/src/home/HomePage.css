@@ -21,7 +21,7 @@
   }
   
 .main-buttons a {
-  background-color: var(--primary);
+  background-color: var(--gray);
   text-decoration: none;
   color: black;
   text-align: center;
@@ -33,6 +33,18 @@
   padding: 20px;
 }
 
+.main-buttons a .card-icon {
+  border-radius: 10px; 
+  width: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.main-buttons a .card-icon img {
+  width: 35px;
+}
+
 .main-buttons a .card-info {
   display: flex;
   flex-direction: column;
@@ -40,7 +52,9 @@
   align-items: flex-start;
   margin-left: 20px;
   min-width: 80px;
+  color: var(--light);
 }
+
 
 .main-buttons a .card-info .card-quantity {
   font-size: xx-large;
