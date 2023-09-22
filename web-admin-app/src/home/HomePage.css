@@ -29,8 +29,13 @@
   font-size: large;
   min-width: 20%;
   border-radius: 10px;
+  transition: all .2s ease-in-out; 
   display: flex;
   padding: 20px;
+}
+
+.main-buttons a:hover {
+  transform: scale(1.04);
 }
 
 .main-buttons a .card-icon {
