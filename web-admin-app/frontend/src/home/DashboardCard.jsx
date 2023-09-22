@@ -8,7 +8,7 @@ const DashboardCard = (props) => {
         <img src={props.icon} alt="Icono" />
       </div>
       <div className="card-info">
-        <span className="card-quantity">0</span>
+        <span className="card-quantity">{props.count}</span>
         <span className="card-name">{props.name}</span>
       </div>
     </Link>
