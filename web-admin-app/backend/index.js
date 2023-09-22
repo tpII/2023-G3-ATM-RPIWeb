@@ -25,6 +25,7 @@ const userApi = require('./routes/userApi')
 
 app.use(express.json());
 app.use(cors())
+app.use((req, _, next) => {console.log('API Request: ', req.url); next()})
 app.use('/api/users', userApi);
 
 // Quedarse a la escucha...
