@@ -7,6 +7,6 @@ const schema = new mongoose.Schema({
 });
 
 // Crea un modelo a partir del esquema
-const User = mongoose.model("User", schema);
+const User = mongoose.model("Cliente", schema);
 
 module.exports = User;
