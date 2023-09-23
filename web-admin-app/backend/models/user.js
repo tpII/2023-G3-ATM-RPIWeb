@@ -2,8 +2,7 @@ const mongoose = require('mongoose')
 
 // Definición de esquemas (campos de los documentos)
 const schema = new mongoose.Schema({
-  name: String,
-  email: String,
+  nombre: String
 });
 
 // Crea un modelo a partir del esquema

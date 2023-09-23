@@ -9,6 +9,8 @@ const controller = {
         c = await model.countDocuments({});
         res.json({count: c})
     }
+
+    
 }
 
 module.exports = controller;
