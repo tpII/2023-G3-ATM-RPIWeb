@@ -24,6 +24,7 @@ db.once('open', () => {
 const userApi = require('./routes/userApi')
 const cardApi = require('./routes/cardApi')
 const moveApi = require('./routes/moveApi')
+const cuentaApi = require('./routes/cuentaApi')
 
 app.use(express.json());
 app.use(cors())
@@ -31,6 +32,7 @@ app.use((req, _, next) => {console.log('API Request: ', req.url); next()})
 app.use('/api/users', userApi);
 app.use('/api/cards', cardApi);
 app.use('/api/moves', moveApi);
+app.use('/api/cuentas', cuentaApi);
 
 // Quedarse a la escucha...
 app.listen(PORT, () => {
