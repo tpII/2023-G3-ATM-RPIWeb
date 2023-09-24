@@ -1,25 +1,32 @@
 import React from "react";
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import axios from "axios"
+
 function Tarjetas() {
-  const [cards, setCards] = useState([{}]);
-  const navigate=useNavigate();
-  useEffect(() => {
+  const [cards, setCards] = useState([]);
+
+  const getAll = () => {
     fetch("http://127.0.0.1:2000/api/cards/all")
       .then((res) => res.json())
       .then((data) => setCards(data.tarjetas))
       .catch((err) => console.error("Error: ", err));
+  }
+
+  useEffect(() => {
+    getAll()
   }, [])
 
   const banear = (id) => {
     axios.patch(`http://127.0.0.1:2000/api/cards/banear/${id}`)
-    .then(window.location.replace("/cards"))
+      .then(_ => getAll())
+      .catch(err => console.error(err))
   };
 
   const desbanear = (id) => {
     axios.patch(`http://127.0.0.1:2000/api/cards/desbanear/${id}`)
-    .then(window.location.replace("/cards"))
+      .then(_ => getAll())
+      .catch(err => console.error(err))
   };
 
   return (
