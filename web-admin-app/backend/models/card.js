@@ -7,7 +7,6 @@ const schema = new mongoose.Schema({
   nro:String, //es el numero parseado de la raspberry pi
   pin:Number,
   fechavto:Date,
-  pin: Number,
   cvv: Number,
   ban: Boolean
 });

@@ -5,6 +5,8 @@ import Banner from './banner/Banner';
 // rutas
 import {BrowserRouter, Route, Routes} from 'react-router-dom'
 import HomePage from './home/HomePage';
+import Tarjetas from './tarjeta/tarjetas';
+import Agregartarjetas from './tarjeta/agregartarjeta';
 
 function App() {
 
@@ -39,6 +41,8 @@ function App() {
 
         <Routes>
           <Route path='/' element={<HomePage/>} />
+          <Route path='/cards' element={<Tarjetas/>} />
+          <Route path='/agregartarjeta' element={<Agregartarjetas/>} />
         </Routes>
       </BrowserRouter>
       
