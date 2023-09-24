@@ -11,6 +11,45 @@
   margin-left: 40px;
 }
 
+.home h1#titulo-cajero {
+  margin-bottom: 10px;
+}
+
+.home .cash {
+  font-size: xx-large;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 10%;
+}
+
+.home .cash h1 {
+  margin-top: 10px;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.home .cash .circular-btn {
+  background-color: var(--primary);
+  border-radius: 20px;
+  margin-bottom: 20px;
+  cursor: pointer;
+}
+
+.home .cash .edit {
+  background-color: #AAAAFF;
+}
+
+.home .cash .settings {
+  background-color: #AAFFAA;
+}
+
+.home .cash img {
+  width: 40px;
+  height: 30px;
+}
+
 .main-buttons {
     display: flex;
     flex-direction: row;
