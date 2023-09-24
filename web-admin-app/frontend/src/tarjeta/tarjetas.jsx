@@ -3,6 +3,9 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios"
 
+// estilos
+import "./tarjetas.css"
+
 function Tarjetas() {
   const [cards, setCards] = useState([]);
 
