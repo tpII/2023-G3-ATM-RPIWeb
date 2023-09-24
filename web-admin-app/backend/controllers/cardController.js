@@ -10,6 +10,11 @@ const controller = {
         res.json({count: c})
     },
 
+    getCards: async(req, res) => {
+        c = await model.find();
+        res.json({tarjetas: c});
+    },
+
     postCard: async(req,res)  => {
         const {nro, pin, fechavto,cvv} = req.body
         const newCard = new model({
@@ -22,6 +27,38 @@ const controller = {
         const savedCard = await newCard.save()
         res.json(savedCard);
         
+    },
+
+    banearTarjeta: async(req,res) => {
+        let tarjeta = await model.findById(req.params.id).exec();
+        if (!tarjeta) return res.status(404).json({message:"No se encontro la tarjeta en el sistema"});
+        tarjeta = await model.findByIdAndUpdate(req.params.id, {
+            cliente: tarjeta.cliente,
+            nro: tarjeta.nro,
+            pin: tarjeta.pin,
+            fechavto: tarjeta.fechavto,
+            cvv: tarjeta.cvv,
+            ban: true
+        }, { new: true });
+        tarjeta = await tarjeta.save();
+        if (!tarjeta) return res.status(404).json({message:"Ha ocurrido un error"});
+        res.json(tarjeta);
+    },
+
+    desbanearTarjeta: async(req,res) => {
+        let tarjeta = await model.findById(req.params.id).exec();
+        if (!tarjeta) return res.status(404).json({message:"No se encontro la tarjeta en el sistema"});
+        tarjeta = await model.findByIdAndUpdate(req.params.id, {
+            cliente: tarjeta.cliente,
+            nro: tarjeta.nro,
+            pin: tarjeta.pin,
+            fechavto: tarjeta.fechavto,
+            cvv: tarjeta.cvv,
+            ban: false
+        }, { new: true });
+        tarjeta = await tarjeta.save();
+        if (!tarjeta) return res.status(404).json({message:"Ha ocurrido un error"});
+        res.json(tarjeta);
     }
 }
 
