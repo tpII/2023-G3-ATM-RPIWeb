@@ -16,13 +16,14 @@ const controller = {
     },
 
     postCard: async(req,res)  => {
-        const {nro, pin, fechavto,cvv} = req.body
+        const {clienteSeleccionado, nro, pin, fechavto,cvv} = req.body
         const newCard = new model({
+            cliente:clienteSeleccionado,
             nro:nro, //es el numero parseado de la raspberry pi
             pin:pin,
             fechavto:fechavto,
             cvv: cvv,
-            ban: false
+            ban: false,
         })
         const savedCard = await newCard.save()
         res.json(savedCard);

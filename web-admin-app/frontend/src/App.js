@@ -7,6 +7,8 @@ import {BrowserRouter, Route, Routes} from 'react-router-dom'
 import HomePage from './home/HomePage';
 import Tarjetas from './tarjeta/tarjetas';
 import Agregartarjetas from './tarjeta/agregartarjeta';
+import Usuario from './usuario/usuarios';
+import Agregarusuario from './usuario/agregarusuario';
 
 function App() {
 
@@ -43,6 +45,8 @@ function App() {
           <Route path='/' element={<HomePage/>} />
           <Route path='/cards' element={<Tarjetas/>} />
           <Route path='/agregartarjeta' element={<Agregartarjetas/>} />
+          <Route path='/users' element={<Usuario/>} />
+          <Route path='/agregarusuario' element={<Agregarusuario/>} />
         </Routes>
       </BrowserRouter>
       
