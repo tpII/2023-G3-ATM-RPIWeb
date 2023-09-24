@@ -1,0 +1,16 @@
+.tarjetas {
+    margin-top: 20px;
+}
+
+.tarjetas * {
+    text-decoration: none;
+}
+
+.tarjetas li {
+    color: var(--light);
+}
+
+.tarjetas button {
+    margin-left: 20px;
+    margin-right: 20px;
+}
