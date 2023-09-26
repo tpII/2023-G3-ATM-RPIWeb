@@ -1,10 +1,10 @@
-
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Router, useNavigate } from 'react-router-dom';
+import './cards.css'
 
-function Agregartarjetas() {
-    const navigate=useNavigate();
+function AddCardPage() {
+    const navigate = useNavigate();
     const [nro, setNro] = useState('');
     const [pin, setPin] = useState('');
     const [fechavto, setFechavto] = useState('');
@@ -22,7 +22,8 @@ function Agregartarjetas() {
   
     const handleSubmit = (e) => {
       e.preventDefault();
-      // Aquí puedes enviar los datos del formulario a tu servidor o hacer lo que desees con ellos
+
+      // Crear objeto y realizar post request
       const nuevaTarjeta = {
         clienteSeleccionado,
         nro,
@@ -31,10 +32,9 @@ function Agregartarjetas() {
         cvv: parseInt(cvv)
       };
   
-      console.log('Nueva tarjeta:', nuevaTarjeta);
-      axios.post("http://127.0.0.1:2000/api/cards/addcard",
-        nuevaTarjeta)
+      axios.post("http://127.0.0.1:2000/api/cards/addcard", nuevaTarjeta)
         .then(navigate('/cards',{replace:true}))
+
       // Limpia los campos después de enviar
       setNro('');
       setPin('');
@@ -42,12 +42,13 @@ function Agregartarjetas() {
       setCvv('');
       setClienteSeleccionado('');
     };
+
     const handleChangeCliente = (e) => {
       setClienteSeleccionado(e.target.value);
     };
   
     return (
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className='main-content'>
         <label>
           Número de Tarjeta:
           <input
@@ -57,7 +58,6 @@ function Agregartarjetas() {
             required
           />
         </label>
-        <br />
   
         <label>
           PIN:
@@ -68,7 +68,6 @@ function Agregartarjetas() {
             required
           />
         </label>
-        <br />
   
         <label>
           Fecha de Vencimiento:
@@ -79,7 +78,6 @@ function Agregartarjetas() {
             required
           />
         </label>
-        <br />
   
         <label>
           CVV:
@@ -90,7 +88,6 @@ function Agregartarjetas() {
             required
           />
         </label>
-        <br />
 
         <label>
           Cliente:
@@ -108,10 +105,10 @@ function Agregartarjetas() {
             ))}
           </select>
         </label>
-        <br />
-        <button type="submit">Agregar Tarjeta</button>
+
+        <button type="submit" className='big-btn submit-btn'>Agregar Tarjeta</button>
       </form>
     );
 }
 
-export default Agregartarjetas;
+export default AddCardPage;

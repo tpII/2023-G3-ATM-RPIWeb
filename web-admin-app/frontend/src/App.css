@@ -1,3 +1,29 @@
 .App {
   text-align: center;
 }
+
+label {
+  color: var(--light);
+}
+
+.main-content {
+  margin-top: 20px;
+}
+
+.main-content * {
+  text-decoration: none;
+}
+
+.main-content li {
+  color: var(--light);
+}
+
+.main-content .big-btn {
+  scale: 1.4;
+  margin: 20px;
+}
+
+.main-content .submit-btn {
+  margin: 30px;
+  width: 200px;
+}

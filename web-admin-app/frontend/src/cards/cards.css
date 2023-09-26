@@ -1,0 +1,22 @@
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+form label {
+    margin: 10px;
+}
+
+form label input {
+    margin-left: 16px;
+}
+
+form label select {
+    margin-left: 16px;
+}
+
+.main-content button {
+    margin-left: 20px;
+}

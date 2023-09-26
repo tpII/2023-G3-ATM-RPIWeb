@@ -4,9 +4,9 @@ import { Link } from "react-router-dom";
 import axios from "axios"
 
 // estilos
-import "./tarjetas.css"
+import "./cards.css"
 
-function Tarjetas() {
+function CardListPage() {
   const [cards, setCards] = useState([]);
 
   const getAll = () => {
@@ -16,9 +16,7 @@ function Tarjetas() {
       .catch((err) => console.error("Error: ", err));
   }
 
-  useEffect(() => {
-    getAll()
-  }, [])
+  useEffect(() => { getAll() }, [])
 
   const banear = (id) => {
     axios.patch(`http://127.0.0.1:2000/api/cards/banear/${id}`)
@@ -33,27 +31,30 @@ function Tarjetas() {
   };
 
   return (
-    <main className="tarjetas">
-      
-        <Link to="/agregartarjeta">
+    <main className="main-content">
+
+        <Link to="/cards/add">
             <div className="main-buttons">
-                <button>Agregar Tarjeta</button>
+                <button className="big-btn">Agregar Tarjeta</button>
             </div>
         </Link>
+
         <div>
             <ul>
             {cards.map((card, index) => (
                 <li key={index}>
                     {card.nro}
-                    {card.ban}
-                    {card.ban ?<button onClick={()=> desbanear(card._id) }> Desbanear</button> : <button onClick={()=> banear(card._id) }> Banear</button> }
+                    {card.ban ? 
+                      <button onClick={ ()=> desbanear(card._id) }>Desbanear</button> : 
+                      <button onClick={ ()=> banear(card._id) }>Banear</button> 
+                    }
                 </li>
-            ))}
-                
+            ))}         
             </ul>
         </div>
+
     </main>
   );
 }
 
-export default Tarjetas;
+export default CardListPage;

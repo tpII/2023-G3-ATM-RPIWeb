@@ -1,14 +1,16 @@
 import { useEffect, useState } from 'react';
-import './App.css';
 import Banner from './banner/Banner';
 
 // rutas
 import {BrowserRouter, Route, Routes} from 'react-router-dom'
 import HomePage from './home/HomePage';
-import Tarjetas from './tarjeta/tarjetas';
-import Agregartarjetas from './tarjeta/agregartarjeta';
-import Usuario from './usuario/usuarios';
-import Agregarusuario from './usuario/agregarusuario';
+import CardListPage from './cards/CardListPage';
+import AddCardPage from './cards/AddCardPage';
+import UserListPage from './users/UserListPage';
+import AddUserPage from './users/AddUserPage';
+
+// estilos
+import './App.css';
 
 function App() {
 
@@ -43,10 +45,10 @@ function App() {
 
         <Routes>
           <Route path='/' element={<HomePage/>} />
-          <Route path='/cards' element={<Tarjetas/>} />
-          <Route path='/agregartarjeta' element={<Agregartarjetas/>} />
-          <Route path='/users' element={<Usuario/>} />
-          <Route path='/agregarusuario' element={<Agregarusuario/>} />
+          <Route path='/cards' element={<CardListPage/>} />
+          <Route path='/cards/add' element={<AddCardPage/>} />
+          <Route path='/users' element={<UserListPage/>} />
+          <Route path='/users/add' element={<AddUserPage/>} />
         </Routes>
       </BrowserRouter>
       
