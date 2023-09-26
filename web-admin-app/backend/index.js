@@ -38,14 +38,3 @@ app.use('/api/cuentas', cuentaApi);
 app.listen(PORT, () => {
   console.log(`Servidor en ejecución en el puerto ${PORT}`);
 });
-
-// Prueba de creación de usuario
-/*
-const User = require('./models/user')
-
-const usuario1 = new User({
-  name: 'Sergio',
-  email: 'example@gmail.com'
-})
-
-usuario1.save()*/

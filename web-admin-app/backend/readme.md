@@ -20,8 +20,16 @@ En caso de no reconocerse el comando nodemon, instalarlo globalmente: ```npm i -
 ## API Routes
 Se definieron las siguientes rutas para consultas
 
-* api/users/count: devuelve el número de usuarios registrados.
+* api/users/count: devuelve el número de clientes registrados.
+* api/users/all: devuelve todos los clientes registrados.
+* api/users/adduser: inserta el cliente pasado por parámetro.
+
 * api/cards/count: devuelve el número de tarjetas registradas.
+* api/cards/all: devuelve todas las tarjetas registradas.
+* api/cards/addcard: inserta la tarjeta pasada por parámetro.
+* api/cards/banear/:id: setea en true el campo "ban" de la tarjeta indicada
+* api/cards/desbanear/:id: setea en false el campo "ban" de la tarjeta indicada
+
 * api/moves/count: devuelve el número de transacciones registradas.
 
 Esquema formal de cada modelo sujeto a modificaciones.

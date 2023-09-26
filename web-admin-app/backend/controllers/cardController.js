@@ -4,17 +4,19 @@ const model = require('../models/card');
 // Definir controlador (funciones disponibles)
 const controller = {
 
-    // Devuelve el número de usuarios registrados
+    // Devuelve el número de tarjetas registrados
     getCount: async(req, res) => {
         c = await model.countDocuments({});
         res.json({count: c})
     },
 
+    // Devuelve todas las tarjetas registradas
     getCards: async(req, res) => {
-        c = await model.find();
-        res.json({tarjetas: c});
+        cards = await model.find();
+        res.json({tarjetas: cards});
     },
 
+    // Inserta una tarjeta en la db
     postCard: async(req,res)  => {
         const {clienteSeleccionado, nro, pin, fechavto,cvv} = req.body
         const newCard = new model({
@@ -30,6 +32,7 @@ const controller = {
         
     },
 
+    // Setea en true el campo "ban" de la tarjeta indicada por id
     banearTarjeta: async(req,res) => {
         let tarjeta = await model.findById(req.params.id).exec();
         if (!tarjeta) return res.status(404).json({message:"No se encontro la tarjeta en el sistema"});
@@ -46,6 +49,7 @@ const controller = {
         res.json(tarjeta);
     },
 
+    // Setea en false el campo "ban" de la tarjeta indicada por id 
     desbanearTarjeta: async(req,res) => {
         let tarjeta = await model.findById(req.params.id).exec();
         if (!tarjeta) return res.status(404).json({message:"No se encontro la tarjeta en el sistema"});

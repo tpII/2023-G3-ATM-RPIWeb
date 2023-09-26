@@ -8,6 +8,7 @@ const schema = new mongoose.Schema({
   tipo: String,
   monto: Number
 });
+
 // Crea un modelo a partir del esquema
 const Cuenta = mongoose.model("Cuentas", schema);
 

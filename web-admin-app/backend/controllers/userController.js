@@ -10,11 +10,13 @@ const controller = {
         res.json({count: c})
     },
 
+    // Devuelve todos los usuarios registrados
     getUsers: async(req, res) => {
-        u = await model.find();
-        res.json({Usuarios: u});
+        users = await model.find();
+        res.json({Usuarios: users});
     },
 
+    // Inserta un usuario en la db
     postUser: async(req,res)  => {
         const {nombre} = req.body
         const newUser = new model({
@@ -22,10 +24,7 @@ const controller = {
         })
         const savedUser = await newUser.save()
         res.json(savedUser);
-        
     },
-
-    
 }
 
 module.exports = controller;

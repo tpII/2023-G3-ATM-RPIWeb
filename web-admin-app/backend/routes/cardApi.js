@@ -10,5 +10,6 @@ router.get('/all', controller.getCards)
 router.post('/addcard', controller.postCard)
 router.patch('/banear/:id', controller.banearTarjeta)
 router.patch('/desbanear/:id', controller.desbanearTarjeta)
+
 // Atributo público
 module.exports = router;
