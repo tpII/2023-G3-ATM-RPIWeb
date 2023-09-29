@@ -1,6 +1,7 @@
 import DashboardCard from "./DashboardCard";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import Axios from 'axios'
 
 // assets
 import face from "./face.svg";
@@ -18,24 +19,21 @@ function HomePage() {
 
   useEffect(() => {
     // Obtener cantidades desde la database
-    fetch("http://127.0.0.1:2000/api/users/count")
-      .then(res => res.json())
-      .then(data => setUserCount(data.count))
+    Axios.get("http://127.0.0.1:2000/api/users/count")
+      .then(res => setUserCount(res.data.count))
       .catch(err => console.error("No se puede consultar clientes", err));
 
-    fetch("http://127.0.0.1:2000/api/cards/count")
-      .then(res => res.json())
-      .then(data => setCardCount(data.count))
+    Axios.get("http://127.0.0.1:2000/api/cards/count")
+      .then(res => setCardCount(res.data.count))
       .catch(err => console.error("No se puede consultar tarjetas", err));
 
-    fetch("http://127.0.0.1:2000/api/moves/count")
-      .then(res => res.json())
-      .then(data => setMoveCount(data.count))
+    Axios.get("http://127.0.0.1:2000/api/moves/count")
+      .then(res => setMoveCount(res.data.count))
       .catch(err => console.error("No se puede consultar movimientos", err));
 
-    fetch("http://127.0.0.1:2000/api/cash")
-      .then(res => res.json())
-      .then(data => setCash(data.value))
+    // Obtener efectivo desde suscripción mqtt
+    Axios.get("http://127.0.0.1:2000/api/cash")
+      .then(res => setCash(res.data.value))
       .catch(err => console.error("No se puede consultar el efectivo", err))
   }, []);
 

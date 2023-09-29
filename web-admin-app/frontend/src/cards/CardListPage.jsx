@@ -1,7 +1,7 @@
 import React from "react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios"
+import Axios from "axios"
 
 // estilos
 import "./cards.css"
@@ -10,22 +10,21 @@ function CardListPage() {
   const [cards, setCards] = useState([]);
 
   const getAll = () => {
-    fetch("http://127.0.0.1:2000/api/cards/all")
-      .then((res) => res.json())
-      .then((data) => setCards(data.tarjetas))
-      .catch((err) => console.error("Error: ", err));
+    Axios.get("http://127.0.0.1:2000/api/cards/all")
+      .then(res => setCards(res.data.tarjetas))
+      .catch(err => console.error("Error: ", err));
   }
 
   useEffect(() => { getAll() }, [])
 
   const banear = (id) => {
-    axios.patch(`http://127.0.0.1:2000/api/cards/banear/${id}`)
+    Axios.patch(`http://127.0.0.1:2000/api/cards/banear/${id}`)
       .then(_ => getAll())
       .catch(err => console.error(err))
   };
 
   const desbanear = (id) => {
-    axios.patch(`http://127.0.0.1:2000/api/cards/desbanear/${id}`)
+    Axios.patch(`http://127.0.0.1:2000/api/cards/desbanear/${id}`)
       .then(_ => getAll())
       .catch(err => console.error(err))
   };
