@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import miApi from "..";
 
 function AddUserPage() {
   const [nombre, setNombre] = useState("");
@@ -12,9 +12,9 @@ function AddUserPage() {
     // Crear objeto y realizar post request
     const nuevoUsuario = { nombre };
 
-    axios
-      .post("http://127.0.0.1:2000/api/users/adduser", nuevoUsuario)
-      .then(navigate("/users", { replace: true }));
+    miApi.post("users/adduser", nuevoUsuario)
+      .then(navigate("/users", { replace: true }))
+      .catch(err => console.error("No se puede agregar usuario", err))
 
     // Limpia los campos después de enviar
     setNombre("");

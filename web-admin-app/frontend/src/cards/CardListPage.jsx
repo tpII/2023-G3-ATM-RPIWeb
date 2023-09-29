@@ -1,16 +1,17 @@
 import React from "react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import Axios from "axios"
+import miApi from "..";
 
 // estilos
 import "./cards.css"
+
 
 function CardListPage() {
   const [cards, setCards] = useState([]);
 
   const getAll = () => {
-    Axios.get("http://127.0.0.1:2000/api/cards/all")
+    miApi.get("cards/all")
       .then(res => setCards(res.data.tarjetas))
       .catch(err => console.error("Error: ", err));
   }
@@ -18,13 +19,13 @@ function CardListPage() {
   useEffect(() => { getAll() }, [])
 
   const banear = (id) => {
-    Axios.patch(`http://127.0.0.1:2000/api/cards/banear/${id}`)
+    miApi.patch(`cards/banear/${id}`)
       .then(_ => getAll())
       .catch(err => console.error(err))
   };
 
   const desbanear = (id) => {
-    Axios.patch(`http://127.0.0.1:2000/api/cards/desbanear/${id}`)
+    miApi.patch(`cards/desbanear/${id}`)
       .then(_ => getAll())
       .catch(err => console.error(err))
   };

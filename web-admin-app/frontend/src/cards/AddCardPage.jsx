@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import miApi from '..';
+
+// estilos
 import './cards.css'
 
 function AddCardPage() {
@@ -14,10 +16,9 @@ function AddCardPage() {
 
     useEffect(() => {
       // Obtener cantidades desde la database
-      fetch("http://127.0.0.1:2000/api/users/all")
-        .then((res) => res.json())
-        .then((data) => setClientes(data.Usuarios))
-        .catch((err) => console.error("Error: ", err));
+      miApi.get("users/all")
+        .then(res => setClientes(res.data.Usuarios))
+        .catch(err => console.error("Error: ", err));
     }, []);
   
     const handleSubmit = (e) => {
@@ -32,8 +33,9 @@ function AddCardPage() {
         cvv: parseInt(cvv)
       };
   
-      axios.post("http://127.0.0.1:2000/api/cards/addcard", nuevaTarjeta)
-        .then(navigate('/cards',{replace:true}))
+      miApi.post("cards/addcard", nuevaTarjeta)
+        .then(navigate('/cards', {replace:true}))
+        .catch(err => console.error("No se puede agregar tarjeta", err))
 
       // Limpia los campos después de enviar
       setNro('');
