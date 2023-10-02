@@ -1,6 +1,7 @@
 import DashboardCard from "./DashboardCard";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import io from 'socket.io-client'
 import miApi from "..";
 
 // assets
@@ -10,6 +11,8 @@ import swap_horiz from "./swap_horiz.svg";
 import edit from "./edit.svg";
 import settings from "./settings.svg";
 import "./HomePage.css";
+
+const socket = io.connect('http://localhost:2000');
 
 function HomePage() {
   const [cash, setCash] = useState(0.00);
@@ -35,6 +38,12 @@ function HomePage() {
     miApi.get("cash")
       .then(res => setCash(res.data.value))
       .catch(err => console.error("No se puede consultar el efectivo", err))
+      
+    socket.on('cash', data => {
+      console.log('Efectivo recibido')
+      setCash(data.value)
+    })
+
   }, []);
 
   return (
