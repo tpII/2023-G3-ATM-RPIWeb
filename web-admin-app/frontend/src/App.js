@@ -11,6 +11,7 @@ import AddUserPage from './users/AddUserPage';
 
 // estilos
 import './App.css';
+import MoveListPage from './moves/MoveListPage';
 
 function App() {
 
@@ -49,6 +50,7 @@ function App() {
           <Route path='/cards/add' element={<AddCardPage/>} />
           <Route path='/users' element={<UserListPage/>} />
           <Route path='/users/add' element={<AddUserPage/>} />
+          <Route path='/moves' element={<MoveListPage/>} />
         </Routes>
       </BrowserRouter>
       

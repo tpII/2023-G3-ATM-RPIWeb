@@ -7,11 +7,35 @@ label {
 }
 
 .main-content {
-  margin-top: 20px;
+  margin-top: 45px;
 }
 
 .main-content * {
   text-decoration: none;
+}
+
+.main-content .page-header {
+  margin-left: 30px;
+  display: flex;
+  align-items: center;
+}
+
+.main-content .page-header .card-icon {
+  width: 60px;
+  border-radius: 10px;
+}
+
+.main-content .page-header .card-icon img {
+  width: 35px;
+  margin: 10px;
+}
+
+.main-content .page-header h1 {
+  color: var(--light);
+  text-align: start;
+  margin-left: 25px;
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 .main-content li {

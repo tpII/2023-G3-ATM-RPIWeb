@@ -5,9 +5,9 @@ import io from 'socket.io-client'
 import miApi from "..";
 
 // assets
-import face from "./face.svg";
-import credit_card from "./credit_card.svg";
-import swap_horiz from "./swap_horiz.svg";
+import face from "./../assets/face.svg";
+import credit_card from "./../assets/credit_card.svg";
+import swap_horiz from "./../assets/swap_horiz.svg";
 import edit from "./edit.svg";
 import settings from "./settings.svg";
 import "./HomePage.css";
