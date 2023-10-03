@@ -19,6 +19,10 @@ const controller = {
     // Inserta una tarjeta en la db
     postCard: async(req,res)  => {
         const {clienteSeleccionado, nro, pin, fechavto,cvv} = req.body
+
+        // Control de parámetros
+        if (!clienteSeleccionado) return res.status(404).json({message:"Cliente no especificado"});
+
         const newCard = new model({
             cliente:clienteSeleccionado,
             nro:nro, //es el numero parseado de la raspberry pi

@@ -1,22 +1,32 @@
-form {
+.main-content {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 }
 
-form label {
+.main-content form {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.main-content form label {
     margin: 10px;
 }
 
-form label input {
+.main-content form label input {
     margin-left: 16px;
+    width: 200px;
 }
 
-form label select {
+.main-content form label select {
     margin-left: 16px;
+    width: 208px;
+    margin-bottom: 20px;
 }
 
 .main-content button {
-    margin-left: 20px;
+    align-self: center;
 }
+

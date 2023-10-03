@@ -1,0 +1,79 @@
+.credit-card {
+    background-color: transparent;
+    width: 360px;
+    height: 231px;
+    perspective: 1000px;
+    color: white;
+    margin-bottom: 20px;
+}
+
+.credit-card .inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+}
+
+.credit-card .front, .back {
+    box-shadow: 0 8px 14px 0 rgba(0,0,0,0.2);
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    border-radius: 1rem;
+    background-color: #171717;
+}
+
+.credit-card .logo {
+    position: absolute;
+    bottom: 15px;
+    right: 25px;
+}
+
+.credit-card .chip {
+    position: absolute;
+    top: 30px;
+    left: 25px;
+}
+
+.credit-card .contactless {
+    position: absolute;
+    top: 45px;
+    right: 35px;
+}
+
+.credit-card .number {
+    position: absolute;
+    font-weight: bold;
+    font-size: 1.1em;
+    top: 80px;
+    left: 25px;
+}
+
+.credit-card .valid_thru {
+    position: absolute;
+    font-weight: bold;
+    top: 132px;
+    font-size: .5em;
+    left: 45px;
+}
+
+.credit-card .date_8264 {
+    position: absolute;
+    font-weight: bold;
+    font-size: 0.75em;
+    top: 140px;
+    left: 45px;
+  }
+
+  .credit-card .name {
+    position: absolute;
+    font-weight: bold;
+    font-size: 1em;
+    bottom: 10px;
+    left: 25px;
+}

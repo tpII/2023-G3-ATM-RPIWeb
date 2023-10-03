@@ -4,6 +4,7 @@ import miApi from '..';
 
 // estilos
 import './cards.css'
+import CreditCard from './CreditCard';
 
 function AddCardPage() {
     const navigate = useNavigate();
@@ -23,6 +24,8 @@ function AddCardPage() {
   
     const handleSubmit = (e) => {
       e.preventDefault();
+
+      if (!clienteSeleccionado) return;
 
       // Crear objeto y realizar post request
       const nuevaTarjeta = {
@@ -50,13 +53,26 @@ function AddCardPage() {
     };
   
     return (
-      <form onSubmit={handleSubmit} className='main-content'>
+      // Las tarjetas de Mastercard empiezan con 4 y tienen 13-16 digitos
+      // Fuente: https://moneytips.com/anatomy-of-a-credit-card
+      <div className='main-content'>
+        <CreditCard 
+          numero={nro} 
+          fechavto={fechavto} 
+          nombre={clientes.filter(c => c._id === clienteSeleccionado)[0]?.nombre || "???"}
+        />
+        
+        <form onSubmit={handleSubmit} >
+        
         <label>
           Número de Tarjeta:
           <input
-            type="text"
+            type="number"
             value={nro}
-            onChange={(e) => setNro(e.target.value)}
+            onChange={e => {
+              e.target.value = e.target.value.slice(0,16)
+              setNro(e.target.value)
+            }}
             required
           />
         </label>
@@ -66,7 +82,10 @@ function AddCardPage() {
           <input
             type="number"
             value={pin}
-            onChange={(e) => setPin(e.target.value)}
+            onChange={e => {
+              e.target.value = e.target.value.slice(0,4)
+              setPin(e.target.value)
+            }}
             required
           />
         </label>
@@ -75,6 +94,8 @@ function AddCardPage() {
           Fecha de Vencimiento:
           <input
             type="date"
+            min="2023-01-01"
+            max="2099-12-31"
             value={fechavto}
             onChange={(e) => setFechavto(e.target.value)}
             required
@@ -86,7 +107,10 @@ function AddCardPage() {
           <input
             type="number"
             value={cvv}
-            onChange={(e) => setCvv(e.target.value)}
+            onChange={e => {
+              e.target.value = e.target.value.slice(0, 3);
+              setCvv(e.target.value)
+            }}
             required
           />
         </label>
@@ -98,10 +122,11 @@ function AddCardPage() {
             name="cliente"
             value={clienteSeleccionado}
             onChange={handleChangeCliente}
+            required
           >
-            <option value="">Selecciona un cliente...</option>
-            {clientes.map((cliente) => (
-              <option key={cliente._id} value={cliente._id}>
+            <option key="default" value="">Selecciona un cliente...</option>
+            {clientes.map((cliente, index) => (
+              <option key={index} value={cliente._id}>
                 {cliente.nombre}
               </option>
             ))}
@@ -110,6 +135,9 @@ function AddCardPage() {
 
         <button type="submit" className='big-btn submit-btn'>Agregar Tarjeta</button>
       </form>
+      </div>
+
+      
     );
 }
 
