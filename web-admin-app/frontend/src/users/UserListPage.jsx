@@ -1,21 +1,26 @@
-import React from 'react'
+import React from "react";
 import { Link } from "react-router-dom";
 
-// estilos
-import "./styles.css"
+// assets
+import "./styles.css";
+import icon from "./../assets/face.svg";
 
-function UserListPage() {
+// otros componentes
+import PageHeader from "../common/PageHeader";
+import AddButton from "../common/AddButton";
+
+function UserListPage(props) {
   return (
     <main className="main-content">
-      
-        <Link to="/users/add">
-            <div className="main-buttons">
-                <button className='big-btn'>Agregar Usuario</button>
-            </div>
-        </Link>
+      <div className="main-header">
+        <PageHeader color="#ccccff" name="Usuarios" icon={icon} />
 
+        <Link className="add-btn" to="/users/add">
+          <AddButton darkMode={props.darkMode} />
+        </Link>
+      </div>
     </main>
-  )
+  );
 }
 
-export default UserListPage
+export default UserListPage;

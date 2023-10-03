@@ -2,7 +2,9 @@
 const mongoose = require("mongoose");
 const express = require("express");
 const mqtt = require("mqtt");
-var cors = require("cors"); // CORS para evitar error 'Access-Control-Allow-Origin'
+const http = require("http");
+const cors = require("cors"); // CORS para evitar error 'Access-Control-Allow-Origin'
+const { Server } = require("socket.io");
 
 // Importaciones de APIs
 const userApi = require("./routes/userApi");
@@ -12,6 +14,7 @@ const cuentaApi = require("./routes/cuentaApi");
 
 // Puertos
 const BACKEND_PORT = process.env.PORT || 2000;
+const FRONTEND_PORT = 3000;
 const MQTT_PORT = 1883;
 const DB_PORT = 27017;
 
@@ -21,7 +24,8 @@ const LOCALHOST = "127.0.0.1";
 const DB_NAME = "atm-db";
 
 // Variables globales
-let efectivo = 0.00;
+let efectivo = 0.0;
+let miSocket;
 
 // Configuración MQTT y base de datos local
 mqttConfig();
@@ -31,6 +35,10 @@ dbConfig();
 const app = express();
 app.use(express.json());
 app.use(cors());
+
+// Inicialización WebSocket
+const server = http.createServer(app);
+webSocketConfig();
 
 // Middleware
 app.use((req, res, next) => {
@@ -46,11 +54,11 @@ app.use("/api/cuentas", cuentaApi);
 
 // APIs MQTT
 app.use("/api/cash", (req, res) => {
-  res.json({value: efectivo})
-})
+  res.json({ value: efectivo });
+});
 
 // Backend listening
-app.listen(BACKEND_PORT, () => {
+server.listen(BACKEND_PORT, () => {
   console.log(`Servidor en ejecución en el puerto ${BACKEND_PORT}`);
 });
 
@@ -71,11 +79,13 @@ function mqttConfig() {
     console.log(`Mensaje recibido en el tema ${topic}: ${message.toString()}`);
 
     // Actualizar efectivo
-    if (topic === "cajero/efectivo"){
-      efectivo = parseFloat(message)
+    if (topic === "cajero/efectivo") {
+      efectivo = parseFloat(message);
+
+      miSocket?.emit("cash", { value: efectivo });
     }
   });
-};
+}
 
 // ---- CONFIGURACIÓN BASE DE DATOS -------------------------------------------
 
@@ -90,4 +100,20 @@ function dbConfig() {
   db.once("open", () => {
     console.log("Conectado correctamente a la base de datos!");
   });
-};
+}
+
+// ---- CONFIGURACIÓN WEB SOCKET -------------------------------------------------
+
+function webSocketConfig() {
+  const io = new Server(server, {
+    cors: {
+      origin: `http://localhost:${FRONTEND_PORT}`,
+      methods: ["GET", "POST"],
+    },
+  });
+
+  io.on("connection", (socket) => {
+    console.log("Usuario conectado al socket: ", socket.id);
+    miSocket = socket;
+  });
+}
