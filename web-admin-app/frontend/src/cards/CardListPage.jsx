@@ -40,13 +40,15 @@ function CardListPage() {
 
   return (
     <main className="main-content">
-      <PageHeader color="#ffcccc" icon={icon} name="Tarjetas" />
+      <div className="main-header">
+        <PageHeader color="#ffcccc" icon={icon} name="Tarjetas" />
 
-      <Link to="/cards/add">
-        <div className="main-buttons">
-          <button className="big-btn">Agregar Tarjeta</button>
-        </div>
-      </Link>
+        <Link className="add-btn" to="/cards/add">
+          <div className="main-buttons">
+            <button className="big-btn">Agregar</button>
+          </div>
+        </Link>
+      </div>
 
       <div>
         <ul>

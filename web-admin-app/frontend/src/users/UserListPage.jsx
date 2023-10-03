@@ -11,13 +11,15 @@ import PageHeader from "../common/PageHeader";
 function UserListPage() {
   return (
     <main className="main-content">
-      <PageHeader color="#ccccff" name="Usuarios" icon={icon} />
+      <div className="main-header">
+        <PageHeader color="#ccccff" name="Usuarios" icon={icon} />
 
-      <Link to="/users/add">
-        <div className="main-buttons">
-          <button className="big-btn">Agregar Usuario</button>
-        </div>
-      </Link>
+        <Link className="add-btn" to="/users/add">
+          <div className="main-buttons">
+            <button className="big-btn">Agregar</button>
+          </div>
+        </Link>
+      </div>
     </main>
   );
 }

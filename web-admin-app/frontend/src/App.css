@@ -14,6 +14,17 @@ label {
   text-decoration: none;
 }
 
+.main-header {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.main-content .add-btn {
+  position: fixed;
+  right: 30px;
+}
+
 .main-content .page-header {
   margin-left: 30px;
   display: flex;
@@ -45,6 +56,18 @@ label {
 .main-content .big-btn {
   scale: 1.4;
   margin: 20px;
+  background-color: var(--gray);
+  border-radius: 10px;
+  padding: 10px 20px;
+  color: var(--light);
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .2s ease-in-out; 
+}
+
+.main-content .big-btn:hover {
+  transform: scale(1.04);
 }
 
 .main-content .submit-btn {
