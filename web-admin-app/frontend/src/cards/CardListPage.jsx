@@ -9,8 +9,9 @@ import icon from "./../assets/credit_card.svg";
 
 // otros componentes
 import PageHeader from "../common/PageHeader";
+import AddButton from "../common/AddButton";
 
-function CardListPage() {
+function CardListPage(props) {
   const [cards, setCards] = useState([]);
 
   const getAll = () => {
@@ -44,9 +45,7 @@ function CardListPage() {
         <PageHeader color="#ffcccc" icon={icon} name="Tarjetas" />
 
         <Link className="add-btn" to="/cards/add">
-          <div className="main-buttons">
-            <button className="big-btn">Agregar</button>
-          </div>
+          <AddButton darkMode={props.darkMode} />
         </Link>
       </div>
 

@@ -7,17 +7,16 @@ import icon from "./../assets/face.svg";
 
 // otros componentes
 import PageHeader from "../common/PageHeader";
+import AddButton from "../common/AddButton";
 
-function UserListPage() {
+function UserListPage(props) {
   return (
     <main className="main-content">
       <div className="main-header">
         <PageHeader color="#ccccff" name="Usuarios" icon={icon} />
 
         <Link className="add-btn" to="/users/add">
-          <div className="main-buttons">
-            <button className="big-btn">Agregar</button>
-          </div>
+          <AddButton darkMode={props.darkMode} />
         </Link>
       </div>
     </main>

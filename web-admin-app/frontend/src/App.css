@@ -22,7 +22,7 @@ label {
 
 .main-content .add-btn {
   position: fixed;
-  right: 30px;
+  right: 35px;
 }
 
 .main-content .page-header {
@@ -58,12 +58,16 @@ label {
   margin: 20px;
   background-color: var(--gray);
   border-radius: 10px;
-  padding: 10px 20px;
+  padding: 8px 15px;
   color: var(--light);
   border: none;
   font-weight: 600;
   cursor: pointer;
   transition: all .2s ease-in-out; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
 }
 
 .main-content .big-btn:hover {
