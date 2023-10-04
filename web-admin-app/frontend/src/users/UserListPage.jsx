@@ -45,6 +45,7 @@ function UserListPage(props) {
           <thead>
             <tr>
               <th>Nombre y Apellido</th>
+              <th>Tarjetas</th>
               <th>Opciones</th>
             </tr>
           </thead>
@@ -52,6 +53,8 @@ function UserListPage(props) {
             {users.map((u, index) => (
               <tr className={index % 2 ? "style1" : "style2"} key={index}>
                 <td>{u.nombre}</td>
+                {/* Recordatorio: en JS, length ES UN ATRIBUTO, como en Java */}
+                <td>{u.tarjetas?.length}</td>
                 <td>
                   <div className="td-options">
                     <DeleteButton fn={() => deleteFn(u._id)}/>
