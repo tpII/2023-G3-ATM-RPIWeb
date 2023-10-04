@@ -30,3 +30,46 @@
     align-self: center;
 }
 
+.cards-table th {
+    background-color: brown;
+    border-color: red;
+}
+
+.cards-table .style1 {
+    background-color: #ffdddd;
+    color: black
+}
+  
+.cards-table .style2 {
+    background-color: #ffeeee;
+    color: black;
+}
+
+.cards-table .blocked {
+    color: red;
+}
+
+.cards-table .active {
+    color: green;
+}
+
+.cards-table .td-options {
+    display: flex;
+    justify-content: center;
+}
+
+.cards-table #ban-btn {
+    scale: 1;
+    background-color: orange;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+}
+
+.cards-table #unban-btn {
+    scale: 1;
+    background-color: blue;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+}

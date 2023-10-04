@@ -10,6 +10,8 @@ import icon from "./../assets/credit_card.svg";
 // otros componentes
 import PageHeader from "../common/PageHeader";
 import AddButton from "../common/AddButton";
+import BlockButton from "./BlockButton";
+import UnlockButton from "./UnlockButton";
 
 function CardListPage(props) {
   const [cards, setCards] = useState([]);
@@ -39,6 +41,18 @@ function CardListPage(props) {
       .catch((err) => console.error(err));
   };
 
+  const addCardSpaces = (nro) => {
+    return (
+      nro.slice(0, 4) +
+      " " +
+      nro.slice(4, 8) +
+      " " +
+      nro.slice(8, 12) +
+      " " +
+      nro.slice(12)
+    );
+  };
+
   return (
     <main className="main-content">
       <div className="main-header">
@@ -49,19 +63,39 @@ function CardListPage(props) {
         </Link>
       </div>
 
-      <div>
-        <ul>
-          {cards.map((card, index) => (
-            <li key={index}>
-              {card.nro}
-              {card.ban ? (
-                <button onClick={() => desbanear(card._id)}>Desbanear</button>
-              ) : (
-                <button onClick={() => banear(card._id)}>Banear</button>
-              )}
-            </li>
-          ))}
-        </ul>
+      <div className="table-container">
+        <table className="cards-table">
+          <thead>
+            <tr>
+              <th>Número</th>
+              <th>Estado</th>
+              <th>Opciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {cards.map((card, index) => (
+              <tr className={index % 2 ? "style1" : "style2"} key={index}>
+                <td>{addCardSpaces(card.nro) || " "}</td>
+
+                {card.ban ? (
+                  <td className="blocked">Bloqueado</td>
+                ) : (
+                  <td className="active">Activo</td>
+                )}
+
+                <td>
+                  <div className="td-options">
+                    {card.ban ? (
+                      <UnlockButton fn={() => desbanear(card._id)} />
+                    ) : (
+                      <BlockButton fn={() => banear(card._id)} />
+                    )}
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </main>
   );
