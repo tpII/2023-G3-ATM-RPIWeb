@@ -32,14 +32,14 @@ function CardListPage(props) {
     miApi
       .patch(`cards/ban/${id}`)
       .then((_) => getAll())
-      .catch(err => alert("Error al banear tarjeta - " + err));
+      .catch(err => alert(err.response?.data?.message));
   };
 
   const desbanear = (id) => {
     miApi
       .patch(`cards/unban/${id}`)
       .then((_) => getAll())
-      .catch((err) => alert("Error al desbloquear tarjeta - " + err));
+      .catch((err) => alert(err.response?.data?.message));
   };
 
   const borrar = (id) => {
@@ -48,8 +48,7 @@ function CardListPage(props) {
       .then( _ => {
         alert("Tarjeta eliminada con éxito")
         getAll()
-      })
-      .catch(err => alert("Error al borrar tarjeta - " + err))
+      }).catch(err => alert(err.response?.data?.message))
   }
 
   const addCardSpaces = (nro) => {

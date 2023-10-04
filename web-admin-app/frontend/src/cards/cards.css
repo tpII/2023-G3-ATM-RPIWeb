@@ -31,7 +31,6 @@
 
 .cards-table th {
     background-color: brown;
-    border-color: red;
 }
 
 .cards-table .style1 {
@@ -50,12 +49,6 @@
 
 .cards-table .active {
     color: green;
-}
-
-.cards-table .td-options {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
 }
 
 .cards-table #ban-btn {
@@ -77,15 +70,4 @@
     display: flex;
     width: 100px;
     justify-content: center;
-}
-
-.cards-table #delete-btn {
-    scale: 1;
-    background-color: red;
-    color: white;
-    margin: 0;
-    display: flex;
-    justify-content: center;
-    width: 100px;
-    gap: 10px;
 }

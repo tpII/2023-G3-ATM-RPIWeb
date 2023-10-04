@@ -37,6 +37,7 @@ function AddUserPage() {
         Nombre y Apellido:
         <input
           type="text"
+          minLength={8}
           value={nombre}
           onChange={(e) => setNombre(e.target.value)}
           required
