@@ -68,6 +68,15 @@ const controller = {
         tarjeta = await tarjeta.save();
         if (!tarjeta) return res.status(404).json({message:"Ha ocurrido un error"});
         res.json(tarjeta);
+    },
+
+    // Elimina una tarjeta de manera permanente
+    deleteCard: async(req, res) => {
+        let tarjeta = await model.findById(req.params.id).exec();
+        if (!tarjeta) return res.status(404).json({message:"No se encontro la tarjeta en el sistema"});
+
+        result = await model.deleteOne({_id: req.params.id});
+        return result ? res.json(result) : res.status(400).json({message: "Error al borrar por id"})
     }
 }
 

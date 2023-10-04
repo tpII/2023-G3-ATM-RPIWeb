@@ -5,7 +5,7 @@ const UnlockButton = (props) => {
   return (
     <button className="big-btn" id="unban-btn" onClick={props.fn}>
       <img src={lock_open} alt="Desbloquear" />
-      <span>Desbloquear</span>
+      <span>Activar</span>
     </button>
   );
 };

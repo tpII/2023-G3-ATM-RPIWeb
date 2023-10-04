@@ -8,8 +8,9 @@ const controller = require('../controllers/cardController');
 router.get('/count', controller.getCount)
 router.get('/all', controller.getCards)
 router.post('/addcard', controller.postCard)
-router.patch('/banear/:id', controller.banearTarjeta)
-router.patch('/desbanear/:id', controller.desbanearTarjeta)
+router.patch('/ban/:id', controller.banearTarjeta)
+router.patch('/unban/:id', controller.desbanearTarjeta)
+router.delete('/borrar/:id', controller.deleteCard)
 
 // Atributo público
 module.exports = router;

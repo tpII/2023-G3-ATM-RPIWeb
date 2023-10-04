@@ -12,6 +12,7 @@ import PageHeader from "../common/PageHeader";
 import AddButton from "../common/AddButton";
 import BlockButton from "./BlockButton";
 import UnlockButton from "./UnlockButton";
+import DeleteButton from "../common/DeleteButton";
 
 function CardListPage(props) {
   const [cards, setCards] = useState([]);
@@ -29,17 +30,27 @@ function CardListPage(props) {
 
   const banear = (id) => {
     miApi
-      .patch(`cards/banear/${id}`)
+      .patch(`cards/ban/${id}`)
       .then((_) => getAll())
-      .catch((err) => console.error(err));
+      .catch(err => alert("Error al banear tarjeta - " + err));
   };
 
   const desbanear = (id) => {
     miApi
-      .patch(`cards/desbanear/${id}`)
+      .patch(`cards/unban/${id}`)
       .then((_) => getAll())
-      .catch((err) => console.error(err));
+      .catch((err) => alert("Error al desbloquear tarjeta - " + err));
   };
+
+  const borrar = (id) => {
+    miApi
+      .delete(`cards/borrar/${id}`)
+      .then( _ => {
+        alert("Tarjeta eliminada con éxito")
+        getAll()
+      })
+      .catch(err => alert("Error al borrar tarjeta - " + err))
+  }
 
   const addCardSpaces = (nro) => {
     return (
@@ -80,7 +91,7 @@ function CardListPage(props) {
                 {card.ban ? (
                   <td className="blocked">Bloqueado</td>
                 ) : (
-                  <td className="active">Activo</td>
+                  <td className="active">Habiltado</td>
                 )}
 
                 <td>
@@ -90,6 +101,7 @@ function CardListPage(props) {
                     ) : (
                       <BlockButton fn={() => banear(card._id)} />
                     )}
+                    <DeleteButton fn={() => borrar(card._id)} />
                   </div>
                 </td>
               </tr>

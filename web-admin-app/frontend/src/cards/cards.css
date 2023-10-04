@@ -56,20 +56,37 @@
 .cards-table .td-options {
     display: flex;
     justify-content: center;
+    gap: 10px;
 }
 
 .cards-table #ban-btn {
     scale: 1;
     background-color: orange;
+    color: white;
     margin: 0;
     display: flex;
     justify-content: center;
+    width: 100px;
+    gap: 10px;
 }
 
 .cards-table #unban-btn {
     scale: 1;
     background-color: blue;
+    color: white;
+    margin: 0;
+    display: flex;
+    width: 100px;
+    justify-content: center;
+}
+
+.cards-table #delete-btn {
+    scale: 1;
+    background-color: red;
+    color: white;
     margin: 0;
     display: flex;
     justify-content: center;
+    width: 100px;
+    gap: 10px;
 }

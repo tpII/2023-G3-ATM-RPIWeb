@@ -18,7 +18,7 @@ function AddUserPage() {
 
     miApi.post("users/adduser", nuevoUsuario)
       .then(navigate("/users", { replace: true }))
-      .catch(err => console.error("No se puede agregar usuario", err))
+      .catch(err => alert("Error al agregar usuario - " + err))
 
     // Limpia los campos después de enviar
     setNombre("");

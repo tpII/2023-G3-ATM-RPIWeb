@@ -44,7 +44,7 @@ function AddCardPage() {
     miApi
       .post("cards/addcard", nuevaTarjeta)
       .then(navigate("/cards", { replace: true }))
-      .catch((err) => console.error("No se puede agregar tarjeta", err));
+      .catch((err) => alert("Error al agregar tarjeta - " + err));
 
     // Limpia los campos después de enviar
     setNro("");
