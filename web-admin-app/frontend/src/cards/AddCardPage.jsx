@@ -30,7 +30,18 @@ function AddCardPage() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    // Control de parámetros
     if (!clienteSeleccionado) return;
+    
+    if (nro.length < 16) {
+      alert("Número de tarjeta debe tener 16 dígitos")
+      return
+    }
+
+    if (cvv.length < 3) {
+      alert("Código de seguridad (CVV) debe tener 3 dígitos")
+      return
+    }
 
     // Crear objeto y realizar post request
     const nuevaTarjeta = {
