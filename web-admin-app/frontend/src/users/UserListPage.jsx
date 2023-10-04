@@ -10,13 +10,18 @@ import icon from "./../assets/face.svg";
 import PageHeader from "../common/PageHeader";
 import AddButton from "../common/AddButton";
 import DeleteButton from "../common/DeleteButton";
+import Loading from "../common/Loading";
 
 function UserListPage(props) {
   const [users, setUsers] = useState([])
+  const [loading, setLoading] = useState(true)
 
   const getAllFn = () => {
     miApi.get("/users/all")
-      .then(res => setUsers(res.data.Usuarios))
+      .then(res => {
+        setUsers(res.data.Usuarios)
+        setTimeout(() => setLoading(false), 200)
+      })
       .catch(err => console.error(err))
   }
 
@@ -40,7 +45,7 @@ function UserListPage(props) {
         </Link>
       </div>
 
-      <div className="table-container">
+      {loading ? <Loading color="blue"/> : <div className="table-container">
         <table className="users-table">
           <thead>
             <tr>
@@ -64,7 +69,7 @@ function UserListPage(props) {
             ))}
           </tbody>
         </table>
-      </div>
+      </div> }
     </main>
   );
 }

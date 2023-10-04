@@ -13,14 +13,19 @@ import AddButton from "../common/AddButton";
 import BlockButton from "./BlockButton";
 import UnlockButton from "./UnlockButton";
 import DeleteButton from "../common/DeleteButton";
+import Loading from "../common/Loading";
 
 function CardListPage(props) {
   const [cards, setCards] = useState([]);
+  const [loading, setLoading] = useState(true)
 
   const getAll = () => {
     miApi
       .get("cards/all")
-      .then((res) => setCards(res.data.tarjetas))
+      .then((res) => {
+        setCards(res.data.tarjetas)
+        setTimeout(() => setLoading(false), 200)
+      })
       .catch((err) => console.error("Error: ", err));
   };
 
@@ -73,7 +78,7 @@ function CardListPage(props) {
         </Link>
       </div>
 
-      <div className="table-container">
+      {loading ? <Loading color="red"/> : <div className="table-container">
         <table className="cards-table">
           <thead>
             <tr>
@@ -107,7 +112,7 @@ function CardListPage(props) {
             ))}
           </tbody>
         </table>
-      </div>
+      </div> }
     </main>
   );
 }

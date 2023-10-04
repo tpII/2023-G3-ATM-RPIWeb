@@ -150,3 +150,29 @@ tr:last-of-type td:last-of-type {
   width: 30%;
   border-radius: 1em;
 }
+
+.loader-container {
+  width: 100%;
+  margin-top: 130px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+}
+
+.spinner {
+  width: 64px;
+  height: 64px;
+  border: 8px solid;
+  border-radius: 50%;
+  animation: spin-anim 1.2s linear infinite;
+}
+
+@keyframes spin-anim {
+  0% {
+      transform: rotate(0deg);
+  }
+  100% {
+      transform: rotate(360deg);
+  }
+}
