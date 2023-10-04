@@ -116,3 +116,20 @@ tr:last-of-type td:first-of-type {
 tr:last-of-type td:last-of-type {
   border-bottom-right-radius: 10px;
 }
+
+.fail-page {
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--light);
+  font-size: 2em;
+  font-weight: 600;
+  gap: 40px;
+}
+
+.fail-page img {
+  width: 30%;
+  border-radius: 1em;
+}
