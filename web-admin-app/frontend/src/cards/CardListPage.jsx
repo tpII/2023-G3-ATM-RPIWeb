@@ -49,7 +49,7 @@ function CardListPage(props) {
 
   const borrar = (id) => {
     miApi
-      .delete(`cards/borrar/${id}`)
+      .delete(`cards/delete/${id}`)
       .then( _ => {
         alert("Tarjeta eliminada con éxito")
         getAll()

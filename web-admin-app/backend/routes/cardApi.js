@@ -10,7 +10,7 @@ router.get('/all', controller.getCards)
 router.post('/addcard', controller.postCard)
 router.patch('/ban/:id', controller.banearTarjeta)
 router.patch('/unban/:id', controller.desbanearTarjeta)
-router.delete('/borrar/:id', controller.deleteCard)
+router.delete('/delete/:id', controller.deleteCard)
 
 // Atributo público
 module.exports = router;
