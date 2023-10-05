@@ -1,6 +1,10 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import miApi from "..";
+import PageHeader from "../common/PageHeader";
+
+// assets
+import icon from './../assets/face.svg'
 
 function AddUserPage() {
   const [nombre, setNombre] = useState("");
@@ -14,18 +18,26 @@ function AddUserPage() {
 
     miApi.post("users/adduser", nuevoUsuario)
       .then(navigate("/users", { replace: true }))
-      .catch(err => console.error("No se puede agregar usuario", err))
+      .catch(err => alert("Error al agregar usuario - " + err))
 
     // Limpia los campos después de enviar
     setNombre("");
   };
 
   return (
-    <form onSubmit={handleSubmit} className="main-content">
+    <div className="main-content">
+      <div className="main-header">
+        <Link to="/users">
+          <PageHeader color="#ccccff" icon={icon} name="Usuarios" />
+        </Link>
+      </div>
+
+      <form onSubmit={handleSubmit} >
       <label>
-        Nombre:
+        Nombre y Apellido:
         <input
           type="text"
+          minLength={8}
           value={nombre}
           onChange={(e) => setNombre(e.target.value)}
           required
@@ -33,6 +45,8 @@ function AddUserPage() {
       </label>
       <button type="submit" className="submit-btn big-btn">Agregar Usuario</button>
     </form>
+    </div>
+    
   );
 }
 

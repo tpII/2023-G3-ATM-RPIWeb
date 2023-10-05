@@ -10,14 +10,22 @@ import icon from "./../assets/credit_card.svg";
 // otros componentes
 import PageHeader from "../common/PageHeader";
 import AddButton from "../common/AddButton";
+import BlockButton from "./BlockButton";
+import UnlockButton from "./UnlockButton";
+import DeleteButton from "../common/DeleteButton";
+import Loading from "../common/Loading";
 
 function CardListPage(props) {
   const [cards, setCards] = useState([]);
+  const [loading, setLoading] = useState(true)
 
   const getAll = () => {
     miApi
       .get("cards/all")
-      .then((res) => setCards(res.data.tarjetas))
+      .then((res) => {
+        setCards(res.data.tarjetas)
+        setTimeout(() => setLoading(false), 200)
+      })
       .catch((err) => console.error("Error: ", err));
   };
 
@@ -27,16 +35,37 @@ function CardListPage(props) {
 
   const banear = (id) => {
     miApi
-      .patch(`cards/banear/${id}`)
+      .patch(`cards/ban/${id}`)
       .then((_) => getAll())
-      .catch((err) => console.error(err));
+      .catch(err => alert(err.response?.data?.message));
   };
 
   const desbanear = (id) => {
     miApi
-      .patch(`cards/desbanear/${id}`)
+      .patch(`cards/unban/${id}`)
       .then((_) => getAll())
-      .catch((err) => console.error(err));
+      .catch((err) => alert(err.response?.data?.message));
+  };
+
+  const borrar = (id) => {
+    miApi
+      .delete(`cards/borrar/${id}`)
+      .then( _ => {
+        alert("Tarjeta eliminada con éxito")
+        getAll()
+      }).catch(err => alert(err.response?.data?.message))
+  }
+
+  const addCardSpaces = (nro) => {
+    return (
+      nro.slice(0, 4) +
+      " " +
+      nro.slice(4, 8) +
+      " " +
+      nro.slice(8, 12) +
+      " " +
+      nro.slice(12)
+    );
   };
 
   return (
@@ -49,20 +78,41 @@ function CardListPage(props) {
         </Link>
       </div>
 
-      <div>
-        <ul>
-          {cards.map((card, index) => (
-            <li key={index}>
-              {card.nro}
-              {card.ban ? (
-                <button onClick={() => desbanear(card._id)}>Desbanear</button>
-              ) : (
-                <button onClick={() => banear(card._id)}>Banear</button>
-              )}
-            </li>
-          ))}
-        </ul>
-      </div>
+      {loading ? <Loading color="red"/> : <div className="table-container">
+        <table className="cards-table">
+          <thead>
+            <tr>
+              <th>Número</th>
+              <th>Estado</th>
+              <th>Opciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {cards.map((card, index) => (
+              <tr className={index % 2 ? "style1" : "style2"} key={index}>
+                <td>{addCardSpaces(card.nro) || " "}</td>
+
+                {card.ban ? (
+                  <td className="blocked">Bloqueado</td>
+                ) : (
+                  <td className="active">Habiltado</td>
+                )}
+
+                <td>
+                  <div className="td-options">
+                    {card.ban ? (
+                      <UnlockButton fn={() => desbanear(card._id)} />
+                    ) : (
+                      <BlockButton fn={() => banear(card._id)} />
+                    )}
+                    <DeleteButton fn={() => borrar(card._id)} />
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div> }
     </main>
   );
 }

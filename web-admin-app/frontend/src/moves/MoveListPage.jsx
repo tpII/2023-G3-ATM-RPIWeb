@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 
 // assets
 import icon from "./../assets/swap_horiz.svg";
@@ -8,10 +8,12 @@ import PageHeader from "../common/PageHeader";
 
 const MoveListPage = () => {
   return (
-    <main className='main-content'>
+    <main className="main-content">
+      <div className="main-header">
         <PageHeader color="#ccffcc" icon={icon} name="Transacciones" />
+      </div>
     </main>
-  )
-}
+  );
+};
 
-export default MoveListPage
+export default MoveListPage;

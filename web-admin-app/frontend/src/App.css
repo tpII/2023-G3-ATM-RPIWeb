@@ -21,7 +21,7 @@ label {
 }
 
 .main-content .add-btn {
-  position: fixed;
+  position: absolute;
   right: 35px;
 }
 
@@ -77,4 +77,102 @@ label {
 .main-content .submit-btn {
   margin: 30px;
   width: 200px;
+}
+
+.main-content .table-container {
+  width: 90%;
+}
+
+.main-content table {
+  width: 90%;
+  margin-top: 60px;
+  border-radius: 10px;
+  border-collapse: collapse;
+}
+
+th {
+  color: white;
+  font-size: 1.2em;
+  padding: 15px;
+}
+
+th:first-of-type {
+  border-top-left-radius: 10px;
+}
+
+th:last-of-type {
+  border-top-right-radius: 10px;
+}
+
+td {
+  padding: 20px;
+  font-weight: 600;
+}
+
+tr:last-of-type td:first-of-type {
+  border-bottom-left-radius: 10px;
+}
+
+tr:last-of-type td:last-of-type {
+  border-bottom-right-radius: 10px;
+}
+
+.td-options {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+#delete-btn {
+  scale: 1;
+  background-color: red;
+  color: white;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  width: 100px;
+  gap: 10px;
+}
+
+.fail-page {
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--light);
+  font-size: 2em;
+  font-weight: 600;
+  gap: 40px;
+}
+
+.fail-page img {
+  width: 30%;
+  border-radius: 1em;
+}
+
+.loader-container {
+  width: 100%;
+  margin-top: 130px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+}
+
+.spinner {
+  width: 64px;
+  height: 64px;
+  border: 8px solid;
+  border-radius: 50%;
+  animation: spin-anim 1.2s linear infinite;
+}
+
+@keyframes spin-anim {
+  0% {
+      transform: rotate(0deg);
+  }
+  100% {
+      transform: rotate(360deg);
+  }
 }
