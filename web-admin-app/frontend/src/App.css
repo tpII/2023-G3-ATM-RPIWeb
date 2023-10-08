@@ -49,6 +49,10 @@ label {
   margin-bottom: 0;
 }
 
+.main-content h1 {
+  color: var(--light);
+}
+
 .main-content li {
   color: var(--light);
 }
