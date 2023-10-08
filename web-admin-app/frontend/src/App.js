@@ -14,6 +14,7 @@ import MoveListPage from "./moves/MoveListPage";
 import "./App.css";
 import Page404 from "./error/Page404";
 import SettingsPage from "./settings/SettingsPage";
+import AddMovePage from "./moves/AddMovePage";
 
 function App() {
   // Estados
@@ -54,6 +55,7 @@ function App() {
           {/* Formularios */}
           <Route path="/users/add" element={<AddUserPage />} />
           <Route path="/cards/add" element={<AddCardPage />} />
+          <Route path="/moves/add" element={<AddMovePage />} />
 
           {/* Otros */}
           <Route path="/settings" element={<SettingsPage/>} />

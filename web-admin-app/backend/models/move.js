@@ -1,10 +1,10 @@
 const mongoose = require('mongoose')
 const ObjectId = mongoose.Schema.ObjectId
 
-// Definición de esquemas (campos de los documentos)
+// Definición de esquemas, con referencias a clientes
 const schema = new mongoose.Schema({
-  emisorId: ObjectId,
-  receptorId: ObjectId,
+  emisorId: {type: ObjectId, ref: "Cliente"},
+  receptorId: {type: ObjectId, ref: "Cliente"},
   monto: Number
 });
 

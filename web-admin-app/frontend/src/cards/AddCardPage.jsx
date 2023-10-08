@@ -149,14 +149,8 @@ function AddCardPage() {
             onChange={handleChangeCliente}
             required
           >
-            <option key="default" value="">
-              Selecciona un cliente...
-            </option>
-            {clientes.map((cliente, index) => (
-              <option key={index} value={cliente._id}>
-                {cliente.nombre}
-              </option>
-            ))}
+            <option key="default" value=""> Selecciona un cliente... </option>
+            { listarClientes(clientes) }
           </select>
         </label>
 
@@ -166,6 +160,14 @@ function AddCardPage() {
       </form>
     </div>
   );
+}
+
+function listarClientes(clientes) {
+  return clientes.map((cliente, index) => (
+    <option key={index} value={cliente._id}>
+      {cliente.nombre}
+    </option>
+  ))
 }
 
 export default AddCardPage;

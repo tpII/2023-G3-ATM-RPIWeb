@@ -62,9 +62,14 @@ function printTable(data) {
         <tbody>
           {data.map((item, index) => (
             <tr className={index % 2 ? "style1" : "style2"} key={index}>
-              <td>{item.origen}</td>
-              <td>{item.destino}</td>
-              <td>{item.monto}</td>
+              <td>{item.emisorId.nombre}</td>
+              <td>{item.receptorId.nombre}</td>
+              <td>{"$" + item.monto?.toFixed(2)}</td>
+              <td>
+                <div className="td-options">
+
+                </div>
+              </td>
             </tr>
           ))}
         </tbody>
