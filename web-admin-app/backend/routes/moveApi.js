@@ -8,6 +8,7 @@ const controller = require('../controllers/moveController');
 router.get('/count', controller.getCount)
 router.get('/all', controller.getAll)
 router.post('/add', controller.post)
+router.delete('/delete/:id', controller.delete)
 
 // Atributo público
 module.exports = router;

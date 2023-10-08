@@ -27,8 +27,18 @@ const controller = {
         })
 
         const saved = await doc.save()
-        if (!saved) res.status(400).json({message: "No se puede insertar en la base de datos"})
-        res.json(saved)
+        return saved ? res.json(saved) : res.status(400).json({message: "Error al insertar"})
+    },
+
+    delete: async(req, res) => {
+        const id = req.params.id
+        if (!id) return res.status(400).json({message: "ID no especificado"})
+
+        const doc = await model.findById(id)
+        if (!doc) return res.status(400).json({message: "ID no encontrado en la base de datos"})
+
+        const result = await doc.deleteOne()
+        return result ? res.json(result) : res.status(400).json({message: "Error al borrar"}) 
     }
 }
 

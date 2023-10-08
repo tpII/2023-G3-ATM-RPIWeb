@@ -10,6 +10,7 @@ import "./styles.css";
 import PageHeader from "../common/PageHeader";
 import AddButton from "../common/AddButton";
 import Loading from "../common/Loading";
+import DeleteButton from "../common/DeleteButton";
 
 const MoveListPage = (props) => {
   const [loading, setLoading] = useState(true);
@@ -32,6 +33,49 @@ const MoveListPage = (props) => {
     getAll();
   }, []);
 
+  const borrar = (id) => {
+    miApi
+      .delete(`moves/delete/${id}`)
+      .then((_) => {
+        alert("Transacción eliminada con éxito");
+        getAll();
+      })
+      .catch((err) => alert(err.response?.data?.message));
+  };
+
+  const printTable = (data) => {
+    return (
+      <div className="table-container">
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Origen</th>
+              <th>Destino</th>
+              <th>Monto</th>
+              <th>Opciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((item, index) => (
+              <tr className={index % 2 ? "style1" : "style2"} key={index}>
+                <td>{ getDate(item._id) }</td>
+                <td>{item.emisorId.nombre}</td>
+                <td>{item.receptorId.nombre}</td>
+                <td>{"$" + item.monto?.toFixed(2)}</td>
+                <td>
+                  <div className="td-options">
+                    <DeleteButton fn={() => borrar(item._id)} />
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  }
+
   return (
     <main className="main-content">
       <div className="main-header">
@@ -47,35 +91,13 @@ const MoveListPage = (props) => {
   );
 };
 
-function printTable(data) {
-  return (
-    <div className="table-container">
-      <table className="data-table">
-        <thead>
-          <tr>
-            <th>Origen</th>
-            <th>Destino</th>
-            <th>Monto</th>
-            <th>Opciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((item, index) => (
-            <tr className={index % 2 ? "style1" : "style2"} key={index}>
-              <td>{item.emisorId.nombre}</td>
-              <td>{item.receptorId.nombre}</td>
-              <td>{"$" + item.monto?.toFixed(2)}</td>
-              <td>
-                <div className="td-options">
+function getDate(id) {
+  return new Date(parseInt(id.substring(0,8), 16) * 1000).toString().substring(3,21)
 
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
+  /*
+  return str.replace("Mon","Lunes").replace("Tue","Martes").replace("Wed","Miércoles")
+    .replace("Thu","Jueves").replace("Fri","Viernes")
+    .replace("Sat","Sábado").replace("Sun", "Domingo") */
 }
 
 export default MoveListPage;
