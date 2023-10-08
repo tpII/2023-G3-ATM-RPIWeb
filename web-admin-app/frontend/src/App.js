@@ -13,6 +13,7 @@ import MoveListPage from "./moves/MoveListPage";
 // estilos
 import "./App.css";
 import Page404 from "./error/Page404";
+import SettingsPage from "./settings/SettingsPage";
 
 function App() {
   // Estados
@@ -55,6 +56,7 @@ function App() {
           <Route path="/cards/add" element={<AddCardPage />} />
 
           {/* Otros */}
+          <Route path="/settings" element={<SettingsPage/>} />
           <Route path="*" element={<Page404 />} />
         </Routes>
       </BrowserRouter>
