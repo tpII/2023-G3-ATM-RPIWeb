@@ -38,9 +38,13 @@ const controller = {
 
     // Setea en true el campo "ban" de la tarjeta indicada por id
     banearTarjeta: async(req,res) => {
-        let tarjeta = await model.findById(req.params.id).exec();
-        if (!tarjeta) return res.status(404).json({message:"No se encontro la tarjeta en el sistema"});
-        tarjeta = await model.findByIdAndUpdate(req.params.id, {
+        const id = req.params.id
+        if (!id) return res.status(400).json({message: "ID no especificado"})
+
+        const tarjeta = await model.findById(id);
+        if (!tarjeta) return res.status(400).json({message: "No se encontró la tarjeta en el sistema"})
+
+        const doc = await model.findByIdAndUpdate(req.params.id, {
             cliente: tarjeta.cliente,
             nro: tarjeta.nro,
             pin: tarjeta.pin,
@@ -48,16 +52,20 @@ const controller = {
             cvv: tarjeta.cvv,
             ban: true
         }, { new: true });
-        tarjeta = await tarjeta.save();
-        if (!tarjeta) return res.status(404).json({message:"Ha ocurrido un error"});
-        res.json(tarjeta);
+
+        const result = await doc.save();
+        return result ? res.json(result) : res.status(400).json({message: "Error al actualizar"});
     },
 
     // Setea en false el campo "ban" de la tarjeta indicada por id 
     desbanearTarjeta: async(req,res) => {
-        let tarjeta = await model.findById(req.params.id).exec();
-        if (!tarjeta) return res.status(404).json({message:"No se encontro la tarjeta en el sistema"});
-        tarjeta = await model.findByIdAndUpdate(req.params.id, {
+        const id = req.params.id
+        if (!id) return res.status(400).json({message: "ID no especificado"})
+
+        const tarjeta = await model.findById(id);
+        if (!tarjeta) return res.status(400).json({message: "No se encontró la tarjeta en el sistema"})
+
+        const doc = await model.findByIdAndUpdate(req.params.id, {
             cliente: tarjeta.cliente,
             nro: tarjeta.nro,
             pin: tarjeta.pin,
@@ -65,18 +73,21 @@ const controller = {
             cvv: tarjeta.cvv,
             ban: false
         }, { new: true });
-        tarjeta = await tarjeta.save();
-        if (!tarjeta) return res.status(404).json({message:"Ha ocurrido un error"});
-        res.json(tarjeta);
+
+        const result = await doc.save();
+        return result ? res.json(result) : res.status(400).json({message: "Error al actualizar"});
     },
 
     // Elimina una tarjeta de manera permanente
     deleteCard: async(req, res) => {
-        let tarjeta = await model.findById(req.params.id).exec();
-        if (!tarjeta) return res.status(404).json({message:"No se encontro la tarjeta en el sistema"});
+        const id = req.params.id
+        if (!id) return res.status(400).json({message: "ID no especificado"})
 
-        result = await model.deleteOne({_id: req.params.id});
-        return result ? res.json(result) : res.status(400).json({message: "Error al borrar por id"})
+        const doc = await model.findById(id)
+        if (!doc) return res.status(400).json({message: "ID no encontrado en la base de datos"})
+
+        const result = await doc.deleteOne()
+        return result ? res.json(result) : res.status(400).json({message: "Error al borrar"}) 
     }
 }
 
