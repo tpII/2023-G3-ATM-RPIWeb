@@ -79,7 +79,7 @@ function CardListPage(props) {
                 {card.ban ? (
                   <td className="blocked">Bloqueado</td>
                 ) : (
-                  <td className="active">Habiltado</td>
+                  <td className="active">Habilitado</td>
                 )}
   
                 <td>
