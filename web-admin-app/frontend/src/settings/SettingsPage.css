@@ -1,0 +1,46 @@
+.bodySettings{
+  background: var(--dark);
+  color: var(--light);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh;
+}
+
+.labelSettings{
+  display: block;
+  font-size: large;
+  font-weight: 700;
+}
+
+.inputSettings{
+  width: 100%;
+  text-align: center;
+  background: var(--gray);
+  border: none;
+  border-radius: 10px;
+  font-size: x-large;
+  font-weight: 300;
+  color: var(--light);
+}
+
+.spanSettings{
+  display: block;
+  color: tomato;
+  font-size: medium;
+}
+
+button.submit-button {
+  background-color: #0074d9;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+/* Estilos al pasar el mouse por encima del botón */
+button.submit-button:hover {
+  background-color: #0056a2;
+}
