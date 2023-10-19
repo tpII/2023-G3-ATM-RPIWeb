@@ -17,16 +17,19 @@ import Loading from "../common/Loading";
 
 function CardListPage(props) {
   const [cards, setCards] = useState([]);
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(true);
 
   const getAll = () => {
     miApi
       .get("cards/all")
       .then((res) => {
-        setCards(res.data.tarjetas)
-        setTimeout(() => setLoading(false), 200)
+        setCards(res.data.tarjetas);
+        setTimeout(() => setLoading(false), 200);
       })
-      .catch((err) => console.error("Error: ", err));
+      .catch((err) => {
+        console.error("Error: ", err);
+        setLoading(false);
+      });
   };
 
   useEffect(() => {
@@ -37,7 +40,7 @@ function CardListPage(props) {
     miApi
       .patch(`cards/ban/${id}`)
       .then((_) => getAll())
-      .catch(err => alert(err.response?.data?.message));
+      .catch((err) => alert(err.response?.data?.message));
   };
 
   const desbanear = (id) => {
@@ -50,35 +53,16 @@ function CardListPage(props) {
   const borrar = (id) => {
     miApi
       .delete(`cards/delete/${id}`)
-      .then( _ => {
-        alert("Tarjeta eliminada con éxito")
-        getAll()
-      }).catch(err => alert(err.response?.data?.message))
-  }
-
-  const addCardSpaces = (nro) => {
-    return (
-      nro.slice(0, 4) +
-      " " +
-      nro.slice(4, 8) +
-      " " +
-      nro.slice(8, 12) +
-      " " +
-      nro.slice(12)
-    );
+      .then((_) => {
+        alert("Tarjeta eliminada con éxito");
+        getAll();
+      })
+      .catch((err) => alert(err.response?.data?.message));
   };
 
-  return (
-    <main className="main-content">
-      <div className="main-header">
-        <PageHeader color="#ffcccc" icon={icon} name="Tarjetas" />
-
-        <Link className="add-btn" to="/cards/add">
-          <AddButton darkMode={props.darkMode} />
-        </Link>
-      </div>
-
-      {loading ? <Loading color="red"/> : <div className="table-container">
+  const printTable = () => {
+    return (
+      <div className="table-container">
         <table className="cards-table">
           <thead>
             <tr>
@@ -91,13 +75,13 @@ function CardListPage(props) {
             {cards.map((card, index) => (
               <tr className={index % 2 ? "style1" : "style2"} key={index}>
                 <td>{addCardSpaces(card.nro) || " "}</td>
-
+  
                 {card.ban ? (
                   <td className="blocked">Bloqueado</td>
                 ) : (
-                  <td className="active">Habiltado</td>
+                  <td className="active">Habilitado</td>
                 )}
-
+  
                 <td>
                   <div className="td-options">
                     {card.ban ? (
@@ -112,8 +96,34 @@ function CardListPage(props) {
             ))}
           </tbody>
         </table>
-      </div> }
+      </div>
+    );
+  }
+
+  return (
+    <main className="main-content">
+      <div className="main-header">
+        <PageHeader color="#ffcccc" icon={icon} name="Tarjetas" />
+
+        <Link className="add-btn" to="/cards/add">
+          <AddButton darkMode={props.darkMode} />
+        </Link>
+      </div>
+
+      {loading ? <Loading color="red" /> : cards?.length ? printTable() : <h1>Sin datos</h1> }
     </main>
+  );
+}
+
+function addCardSpaces(nro) {
+  return (
+    nro.slice(0, 4) +
+    " " +
+    nro.slice(4, 8) +
+    " " +
+    nro.slice(8, 12) +
+    " " +
+    nro.slice(12)
   );
 }
 

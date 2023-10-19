@@ -14,6 +14,8 @@ import SettingsPage from "./settings/SettingsPage"
 // estilos
 import "./App.css";
 import Page404 from "./error/Page404";
+import SettingsPage from "./settings/SettingsPage";
+import AddMovePage from "./moves/AddMovePage";
 
 function App() {
   // Estados
@@ -49,14 +51,16 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/users" element={<UserListPage darkMode={darkMode} />} />
           <Route path="/cards" element={<CardListPage darkMode={darkMode} />} />
-          <Route path="/moves" element={<MoveListPage />} />
+          <Route path="/moves" element={<MoveListPage darkMode={darkMode} />} />
           <Route path="/settings" element={<SettingsPage />} />
 
           {/* Formularios */}
           <Route path="/users/add" element={<AddUserPage />} />
           <Route path="/cards/add" element={<AddCardPage />} />
+          <Route path="/moves/add" element={<AddMovePage />} />
 
           {/* Otros */}
+          <Route path="/settings" element={<SettingsPage/>} />
           <Route path="*" element={<Page404 />} />
         </Routes>
       </BrowserRouter>
