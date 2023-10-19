@@ -9,6 +9,7 @@ import AddCardPage from "./cards/AddCardPage";
 import UserListPage from "./users/UserListPage";
 import AddUserPage from "./users/AddUserPage";
 import MoveListPage from "./moves/MoveListPage";
+import SettingsPage from "./settings/SettingsPage"
 
 // estilos
 import "./App.css";
@@ -51,6 +52,7 @@ function App() {
           <Route path="/users" element={<UserListPage darkMode={darkMode} />} />
           <Route path="/cards" element={<CardListPage darkMode={darkMode} />} />
           <Route path="/moves" element={<MoveListPage darkMode={darkMode} />} />
+          <Route path="/settings" element={<SettingsPage />} />
 
           {/* Formularios */}
           <Route path="/users/add" element={<AddUserPage />} />
