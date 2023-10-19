@@ -10,12 +10,11 @@ import UserListPage from "./users/UserListPage";
 import AddUserPage from "./users/AddUserPage";
 import MoveListPage from "./moves/MoveListPage";
 import SettingsPage from "./settings/SettingsPage"
+import Page404 from "./error/Page404";
+import AddMovePage from "./moves/AddMovePage";
 
 // estilos
 import "./App.css";
-import Page404 from "./error/Page404";
-import SettingsPage from "./settings/SettingsPage";
-import AddMovePage from "./moves/AddMovePage";
 
 function App() {
   // Estados

@@ -6,7 +6,7 @@ import "./SettingsPage.css";
 //valores por defecto
 const minP = 1000;
 const maxP = 50000;
-
+ 
 function Settings() {
   const [minValue, setMinValue] = useState(minP);
   const [maxValue, setMaxValue] = useState(maxP);
