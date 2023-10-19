@@ -41,7 +41,7 @@ function Settings() {
             type="number"
             value={minValue}
             required
-            onChange={(e) => setMinValue(e.target.value)}
+            onChange={(e) => setMinValue(parseInt(e.target.value))}
           />
         </label>
         {minError && <span className='spanSettings'>{minError}</span>}
@@ -52,7 +52,7 @@ function Settings() {
             type="number"
             value={maxValue}
             required
-            onChange={(e) => setMaxValue(e.target.value)}
+            onChange={(e) => setMaxValue(parseInt(e.target.value))}
           />
         </label>
         {maxError && <span className='spanSettings'>{maxError}</span>}
