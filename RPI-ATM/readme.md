@@ -7,3 +7,4 @@ Para el correcto funcionamiento del programa realizado en Python:
 - Habilitar SPI: sudo raspi-config > Interface Options > SPI > Enable > sudo reboot
 - Instalar python3-dev y python3-pip mediante sudo apt i
 - Instalar la librería de lectura RFID mediante sudo pip3 install mfrc522
+- Instalar la librería de MQTT para Python: sudo pip3 install paho-mqtt
