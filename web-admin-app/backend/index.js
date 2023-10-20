@@ -25,16 +25,17 @@ const DB_NAME = "atm-db";
 
 // Variables globales
 let efectivo = 0.0;
+let mqttClient;
 let miSocket;
-
-// Configuración MQTT y base de datos local
-mqttConfig();
-dbConfig();
 
 // Inicialización de Express
 const app = express();
 app.use(express.json());
 app.use(cors());
+
+// Configuración MQTT y base de datos local
+mqttConfig();
+dbConfig();
 
 // Inicialización WebSocket
 const server = http.createServer(app);
@@ -57,6 +58,17 @@ app.use("/api/cash", (req, res) => {
   res.json({ value: efectivo });
 });
 
+// Envío de nuevos limites de extracción
+app.post("/api/settings/limites", (req, res) => {
+  const min = req.body.min
+  const max = req.body.max
+  if (!min || !max) return res.status(400).json({message: "Montos no especificados"})
+  if (!mqttClient) return res.status(400).json({message: "Cliente MQTT no inicializado"})
+  mqttClient.publish("cajero/limite_min", min.toString())
+  mqttClient.publish("cajero/limite_max", max.toString())
+  return res.status(200).json({message: "Límites actualizados con éxito"})
+})
+
 // Backend listening
 server.listen(BACKEND_PORT, () => {
   console.log(`Servidor en ejecución en el puerto ${BACKEND_PORT}`);
@@ -65,13 +77,13 @@ server.listen(BACKEND_PORT, () => {
 // ---- CONFIGURACIÓN MQTT -------------------------------------------
 
 function mqttConfig() {
-  const mqttClient = mqtt.connect(`mqtt://${MQTT_BROKER_IP}:${MQTT_PORT}`);
+  mqttClient = mqtt.connect(`mqtt://${MQTT_BROKER_IP}:${MQTT_PORT}`);
 
   mqttClient.on("connect", () => {
     console.log("Conectado correctamente al broker MQTT");
 
     // Suscribirse al tema
-    mqttClient.subscribe("cajero/efectivo");
+    mqttClient.subscribe("cajero/efectivo")
   });
 
   // Al recibir publicación
@@ -85,6 +97,7 @@ function mqttConfig() {
       miSocket?.emit("cash", { value: efectivo });
     }
   });
+
 }
 
 // ---- CONFIGURACIÓN BASE DE DATOS -------------------------------------------

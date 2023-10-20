@@ -3,7 +3,9 @@ from time import sleep                  # Delay
 from enum import Enum                   # Enumerativos
 from mfrc522 import SimpleMFRC522       # Lector RFID
 import paho.mqtt.publish as publish     # MQTT Python
+import paho.mqtt.client as mqtt
 import RPi.GPIO as GPIO                 # Pines RPI
+import random
 
 # Clases
 class Estados(Enum):
@@ -12,7 +14,13 @@ class Estados(Enum):
 
 # Constantes globales
 CASH_TOPIC = "cajero/efectivo"
+MIN_TOPIC = "cajero/limite_min"
+MAX_TOPIC = "cajero/limite_max"
 HOSTNAME = "192.168.0.27"
+
+# Variables globales
+extraccion_min = 1000
+extraccion_max = 50000
 
 # ---- Funciones ---------------------------------------------
 def readCard(reader):
@@ -34,6 +42,16 @@ def try_parseInt(text):
 def publishCash(cash):
     publish.single(CASH_TOPIC, payload=str(cash), hostname=HOSTNAME)
 
+def onReceiveMqttMessage(mosq, obj, msg):
+    if msg.topic == MIN_TOPIC:
+        global extraccion_min
+        extraccion_min = try_parseInt(msg.payload)
+        print("Se actualizó el mínimo de extracción: $", extraccion_min)
+    elif msg.topic == MAX_TOPIC:
+        global extraccion_max
+        extraccion_max = try_parseInt(msg.payload)
+        print("Se actualizó el máximo de extracción: $", extraccion_max)
+
 # ----------------------------------------------------------
 
 # Setup
@@ -41,7 +59,17 @@ lectorRfid = SimpleMFRC522()
 estado = Estados.ESPERANDO_TARJETA
 timesInMenu = 0
 efectivo = 2000
+
+# Conexión MQTT
+cliente = mqtt.Client(f'session-{random.randint(0, 100)}')
+cliente.connect(HOSTNAME)
+cliente.subscribe(MAX_TOPIC)
+cliente.subscribe(MIN_TOPIC)
 publishCash(efectivo)
+
+# MQTT Callbacks
+cliente.on_message = onReceiveMqttMessage
+cliente.loop_start()        
 
 # Loop
 try:
@@ -66,7 +94,7 @@ try:
                 if (monto > 0):
                     efectivo = efectivo + monto
                     publishCash(efectivo)
-                    sleep(1)
+                    print("Operación realizada con éxito")
                 estado = Estados.MENU
                 timesInMenu = 0
                 
@@ -76,10 +104,16 @@ try:
                 if (monto > efectivo):
                     print("No hay dinero suficiente en cajero. Disculpe las molestias")
                     sleep(2)
+                elif (monto < extraccion_min):
+                    print("El monto mínimo para extraer es $", extraccion_min)
+                    sleep(2)
+                elif (monto > extraccion_max):
+                    print("El monto máximo para extraer es $", extraccion_max)
+                    sleep(2)
                 elif (monto > 0):
                     efectivo = efectivo - monto
                     publishCash(efectivo)
-                    sleep(1)
+                    print("Operación realizada con éxito")
                 estado = Estados.MENU
                 timesInMenu = 0
 

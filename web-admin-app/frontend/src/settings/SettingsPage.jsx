@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import miApi from '..'
 
 //assets
 import "./SettingsPage.css";
+import { useNavigate } from 'react-router-dom';
 
 //valores por defecto
 const minP = 1000;
@@ -12,6 +14,7 @@ function Settings() {
   const [maxValue, setMaxValue] = useState(maxP);
   const [minError, setMinError] = useState();
   const [maxError, setMaxError] = useState();
+  const navigate = useNavigate()
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -27,8 +30,15 @@ function Settings() {
       setMaxError('El máximo no puede ser menor que el mínimo.');
       return;
     } 
-    // Realiza la acción solo si paso las validaciones
-    console.log(`Mínimo: ${minValue}, Máximo: ${maxValue}`);//Persistir datos en algun lado
+
+    // Realiza la acción solo si pasó las validaciones
+    miApi
+      .post('/settings/limites', {min: minValue, max: maxValue})
+      .then(res => {
+        alert(res.data.message)
+        navigate('/', {replace: true})
+      })
+      .catch(err => alert(err.response?.data?.message))
   };
 
   return (
