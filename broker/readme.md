@@ -13,6 +13,12 @@
 
 - En PC: Firewall > Avanzadas > Inbound Rules > File and Printer Sharing (Private) > Enable Rule
 
+## HABILITAR SSH
+- sudo raspi-config
+- Interface Options > SSH > Enable
+
+En PC: usar WinSCP para manejo de archivos y PuTTY para el ingreso de comandos.
+
 ## INSTALAR MOSQUITTO
 - sudo apt install mosquitto mosquitto-clients
 - sudo systemctl status mosquitto
