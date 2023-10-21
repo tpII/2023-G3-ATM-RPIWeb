@@ -34,6 +34,7 @@ extraccion_min = 1000
 extraccion_max = 50000
 pin_error = 0
 esperando = 1
+pin = -1
 
 # ---- Funciones ---------------------------------------------
 def readCard(reader):
@@ -49,16 +50,30 @@ def readPin(sesion, cliente):
     esperando = 1
 
     while esperando:
-       sleep(3)
+       sleep(1)
 
     if pin_error:
         print("La tarjeta no está cargada en el sistema")
+        sleep(2)
         return 0
-    
-    return 1
 
     # Leer digitos de teclado
-    # Comparar
+    pin_correcto = 0
+    intentos_restantes = 3
+
+    while (not pin_correcto) and (intentos_restantes > 0):
+        ingreso = input("Ingrese PIN:")
+        pin_ingresado = try_parseInt(ingreso)
+
+        if pin_ingresado == pin:
+            pin_correcto = 1
+            return 1
+        else:
+            intentos_restantes = intentos_restantes - 1
+
+    # Se pasó de los intentos disponibles
+    print("Se alcanzó la máxima cantidad de intentos permitidos")
+    return 0
 
 def showMenu():
     print("1. Ingresar dinero")
@@ -90,6 +105,8 @@ def onReceiveMqttMessage(mosq, obj, msg):
     elif msg.topic == "cajero/pin_response":
         global esperando
         global pin_error
+        global pin
+
         pin = try_parseInt(msg.payload)
         pin_error = 1 if pin == -1 else 0
         esperando = 0
