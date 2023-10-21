@@ -18,7 +18,7 @@ const controller = {
         const cuenta = await model.findById(cuentaId);
         if (!cuenta) return res.status(400).json({message: "No se encontró la cuenta en el sistema"})
 
-        const doc = await model.findByIdAndUpdate(cuentaId, {monto: monto}, {new: true})
+        const doc = await model.findByIdAndUpdate(cuentaId, {monto: nuevo_monto}, {new: true})
         const result = await doc.save();
         return result ? res.json(result) : res.status(400).json({message: "Error al actualizar"});
     }
