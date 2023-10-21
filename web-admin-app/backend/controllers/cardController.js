@@ -53,14 +53,7 @@ const controller = {
         const tarjeta = await model.findById(id);
         if (!tarjeta) return res.status(400).json({message: "No se encontró la tarjeta en el sistema"})
 
-        const doc = await model.findByIdAndUpdate(req.params.id, {
-            cliente: tarjeta.cliente,
-            nro: tarjeta.nro,
-            pin: tarjeta.pin,
-            fechavto: tarjeta.fechavto,
-            cvv: tarjeta.cvv,
-            ban: true
-        }, { new: true });
+        const doc = await model.findByIdAndUpdate(req.params.id, {ban: true}, { new: true });
 
         const result = await doc.save();
         return result ? res.json(result) : res.status(400).json({message: "Error al actualizar"});
@@ -74,14 +67,7 @@ const controller = {
         const tarjeta = await model.findById(id);
         if (!tarjeta) return res.status(400).json({message: "No se encontró la tarjeta en el sistema"})
 
-        const doc = await model.findByIdAndUpdate(req.params.id, {
-            cliente: tarjeta.cliente,
-            nro: tarjeta.nro,
-            pin: tarjeta.pin,
-            fechavto: tarjeta.fechavto,
-            cvv: tarjeta.cvv,
-            ban: false
-        }, { new: true });
+        const doc = await model.findByIdAndUpdate(req.params.id, {ban: false}, { new: true });
 
         const result = await doc.save();
         return result ? res.json(result) : res.status(400).json({message: "Error al actualizar"});
