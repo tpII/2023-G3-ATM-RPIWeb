@@ -36,6 +36,15 @@ const controller = {
         
     },
 
+    // Inserta una tarjeta con los datos elementales (desde cajero)
+    getPin: async(req, res) => {
+        const nro = req.params.nro
+        if (!nro) return res.status(400).json({message: "Numero no especificado"})
+
+        const pin = await model.findOne({nro: nro}, 'pin -_id')
+        return pin ? res.json(pin) : res.status(400).json({message: "Tarjeta no encontrada"})
+    },
+
     // Setea en true el campo "ban" de la tarjeta indicada por id
     banearTarjeta: async(req,res) => {
         const id = req.params.id

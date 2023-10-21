@@ -7,10 +7,21 @@ import paho.mqtt.client as mqtt
 import RPi.GPIO as GPIO                 # Pines RPI
 import random
 
-# Clases
+# ---- Clases ------------------------------
 class Estados(Enum):
     ESPERANDO_TARJETA = 1
     MENU = 2
+
+
+class Sesion():
+
+    # Constructor
+    def __init__(self, id, text):
+        self.id = id
+        self.text = text
+        self.autenticado = False
+
+# -----------------------------------------------
 
 # Constantes globales
 CASH_TOPIC = "cajero/efectivo"
@@ -24,7 +35,14 @@ extraccion_max = 50000
 
 # ---- Funciones ---------------------------------------------
 def readCard(reader):
-    reader.read()
+    id, text = reader.read()
+    return Sesion(id, text)
+
+def readPin(sesion):
+    # Solicitar PIN a MongoDB (vía MQTT)
+    # Leer digitos de teclado
+    # Comparar
+    pass
 
 def showMenu():
     print("1. Ingresar dinero")
@@ -61,7 +79,7 @@ timesInMenu = 0
 efectivo = 2000
 
 # Conexión MQTT
-cliente = mqtt.Client(f'session-{random.randint(0, 100)}')
+cliente = mqtt.Client(f'cajero-{random.randint(0, 100)}')
 cliente.connect(HOSTNAME)
 cliente.subscribe(MAX_TOPIC)
 cliente.subscribe(MIN_TOPIC)
@@ -76,7 +94,8 @@ try:
     while 1:
         if estado == Estados.ESPERANDO_TARJETA:
             print("Esperando tarjeta")
-            readCard(lectorRfid)
+            sesion = readCard(lectorRfid)
+            readPin(sesion)
             print("Bienvenido!")
             estado = Estados.MENU
             timesInMenu = 0

@@ -5,6 +5,7 @@ const mqtt = require("mqtt");
 const http = require("http");
 const cors = require("cors"); // CORS para evitar error 'Access-Control-Allow-Origin'
 const { Server } = require("socket.io");
+const axios = require('axios')
 
 // Importaciones de APIs
 const userApi = require("./routes/userApi");
@@ -78,23 +79,28 @@ server.listen(BACKEND_PORT, () => {
 
 function mqttConfig() {
   mqttClient = mqtt.connect(`mqtt://${MQTT_BROKER_IP}:${MQTT_PORT}`);
+  const CASH_TOPIC = "cajero/efectivo"
+  const REQUEST_PIN_TOPIC = "cajero/request_pin"
+  const RESPONSE_PIN_TOPIC = "cajero/response_pin"
 
   mqttClient.on("connect", () => {
     console.log("Conectado correctamente al broker MQTT");
-
-    // Suscribirse al tema
-    mqttClient.subscribe("cajero/efectivo")
+    mqttClient.subscribe(CASH_TOPIC)
+    mqttClient.subscribe(REQUEST_PIN_TOPIC)
   });
 
   // Al recibir publicación
   mqttClient.on("message", (topic, message) => {
     console.log(`Mensaje recibido en el tema ${topic}: ${message.toString()}`);
 
-    // Actualizar efectivo
-    if (topic === "cajero/efectivo") {
+    // Filtrar por tema
+    if (topic === CASH_TOPIC) {
       efectivo = parseFloat(message);
-
       miSocket?.emit("cash", { value: efectivo });
+    } else if (topic === REQUEST_PIN_TOPIC) {
+      axios.get(`http://127.0.0.1:2000/api/cards/pin/${message}`)
+        .then(res => mqttClient.publish(RESPONSE_PIN_TOPIC, res.data.pin.toString()))
+        .catch(err => console.error(err.response?.data?.message))
     }
   });
 
