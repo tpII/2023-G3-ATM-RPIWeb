@@ -32,17 +32,33 @@ HOSTNAME = "192.168.0.27"
 # Variables globales
 extraccion_min = 1000
 extraccion_max = 50000
+pin_error = 0
+esperando = 1
 
 # ---- Funciones ---------------------------------------------
 def readCard(reader):
     id, text = reader.read()
     return Sesion(id, text)
 
-def readPin(sesion):
+def readPin(sesion, cliente):
     # Solicitar PIN a MongoDB (vía MQTT)
+    publish.single("cajero/pin_request", sesion.id, hostname=HOSTNAME)
+    global esperando
+    global pin_error
+
+    esperando = 1
+
+    while esperando:
+       sleep(3)
+
+    if pin_error:
+        print("La tarjeta no está cargada en el sistema")
+        return 0
+    
+    return 1
+
     # Leer digitos de teclado
     # Comparar
-    pass
 
 def showMenu():
     print("1. Ingresar dinero")
@@ -61,6 +77,8 @@ def publishCash(cash):
     publish.single(CASH_TOPIC, payload=str(cash), hostname=HOSTNAME)
 
 def onReceiveMqttMessage(mosq, obj, msg):
+    #print("Se recibio", msg.payload, "en topico", msg.topic)
+
     if msg.topic == MIN_TOPIC:
         global extraccion_min
         extraccion_min = try_parseInt(msg.payload)
@@ -69,6 +87,12 @@ def onReceiveMqttMessage(mosq, obj, msg):
         global extraccion_max
         extraccion_max = try_parseInt(msg.payload)
         print("Se actualizó el máximo de extracción: $", extraccion_max)
+    elif msg.topic == "cajero/pin_response":
+        global esperando
+        global pin_error
+        pin = try_parseInt(msg.payload)
+        pin_error = 1 if pin == -1 else 0
+        esperando = 0
 
 # ----------------------------------------------------------
 
@@ -83,6 +107,7 @@ cliente = mqtt.Client(f'cajero-{random.randint(0, 100)}')
 cliente.connect(HOSTNAME)
 cliente.subscribe(MAX_TOPIC)
 cliente.subscribe(MIN_TOPIC)
+cliente.subscribe("cajero/pin_response")
 publishCash(efectivo)
 
 # MQTT Callbacks
@@ -95,10 +120,12 @@ try:
         if estado == Estados.ESPERANDO_TARJETA:
             print("Esperando tarjeta")
             sesion = readCard(lectorRfid)
-            readPin(sesion)
-            print("Bienvenido!")
-            estado = Estados.MENU
-            timesInMenu = 0
+            exito = readPin(sesion, cliente)
+
+            if exito:
+                print("Bienvenido!")
+                estado = Estados.MENU
+                timesInMenu = 0
 
         elif estado == Estados.MENU:
             if timesInMenu == 0:

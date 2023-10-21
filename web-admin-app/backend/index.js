@@ -80,8 +80,8 @@ server.listen(BACKEND_PORT, () => {
 function mqttConfig() {
   mqttClient = mqtt.connect(`mqtt://${MQTT_BROKER_IP}:${MQTT_PORT}`);
   const CASH_TOPIC = "cajero/efectivo"
-  const REQUEST_PIN_TOPIC = "cajero/request_pin"
-  const RESPONSE_PIN_TOPIC = "cajero/response_pin"
+  const REQUEST_PIN_TOPIC = "cajero/pin_request"
+  const RESPONSE_PIN_TOPIC = "cajero/pin_response"
 
   mqttClient.on("connect", () => {
     console.log("Conectado correctamente al broker MQTT");
@@ -100,7 +100,7 @@ function mqttConfig() {
     } else if (topic === REQUEST_PIN_TOPIC) {
       axios.get(`http://127.0.0.1:2000/api/cards/pin/${message}`)
         .then(res => mqttClient.publish(RESPONSE_PIN_TOPIC, res.data.pin.toString()))
-        .catch(err => console.error(err.response?.data?.message))
+        .catch(err => mqttClient.publish(RESPONSE_PIN_TOPIC, "-1"))
     }
   });
 
