@@ -25,6 +25,7 @@ const LOCALHOST = "127.0.0.1";
 const DB_NAME = "atm-db";
 
 // Variables globales
+let cajero_activo = false
 let efectivo = 0.0;
 let mqttClient;
 let miSocket;
@@ -55,9 +56,8 @@ app.use("/api/moves", moveApi);
 app.use("/api/cuentas", cuentaApi);
 
 // APIs MQTT
-app.use("/api/cash", (req, res) => {
-  res.json({ value: efectivo });
-});
+app.use("/api/status", (req, res) => res.json({value: cajero_activo}))
+app.use("/api/cash", (req, res) => res.json({ value: efectivo }))
 
 // Envío de nuevos limites de extracción
 app.post("/api/settings/limites", (req, res) => {
@@ -100,11 +100,13 @@ function mqttConfig() {
       efectivo = parseFloat(message);
       miSocket?.emit("cash", { value: efectivo });
     } else if (topic === REQUEST_PIN_TOPIC) {
-      axios.get(`http://127.0.0.1:2000/api/cards/pin/${message}`)
+      axios.get(`http://${MQTT_BROKER_IP}/api/cards/pin/${message}`)
         .then(res => mqttClient.publish(RESPONSE_PIN_TOPIC, res.data.pin.toString()))
         .catch(err => mqttClient.publish(RESPONSE_PIN_TOPIC, "-1"))
     } else if (topic == STATUS_TOPIC){
-      console.log(message.toString() === "1" ? "Cajero en servicio" : "Cajero desconectado")
+      cajero_activo = message.toString() === "1"
+      if (miSocket) console.log("Emitiendo estado via socket")
+      miSocket?.emit('status', {value: cajero_activo})
     }
   });
 

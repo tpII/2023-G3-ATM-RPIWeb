@@ -15,6 +15,7 @@ import "./HomePage.css";
 const socket = io.connect('http://localhost:2000');
 
 function HomePage() {
+  const [status, setStatus] = useState(0)
   const [cash, setCash] = useState(0.00);
   const [userCount, setUserCount] = useState(0);
   const [cardCount, setCardCount] = useState(0);
@@ -39,17 +40,23 @@ function HomePage() {
       .then(res => setCash(res.data.value))
       .catch(err => console.error("No se puede consultar el efectivo", err))
       
-    socket.on('cash', data => {
-      console.log('Efectivo recibido')
-      setCash(data.value)
-    })
+    socket.on('cash', data => setCash(data.value))
+
+    // Consultar estado del cajero
+    miApi.get("status")
+      .then(res => setStatus(res.data.value))
+      .catch(err => console.error("No se puede consultar estado del cajero", err))
+
+    socket.on('status', data => setStatus(data.value))
 
   }, []);
 
   return (
     <main className="home">
       <h1 id="titulo-cajero">Efectivo en cajero</h1>
-      <div className="cash">
+
+      {/* Si el cajero está en servicio, mostrar efectivo */}
+      {status ? <div className="cash">
         <div className="circular-btn edit">
           <img src={edit} alt="Editar" />
         </div>
@@ -60,7 +67,7 @@ function HomePage() {
         <Link to="/settings" className="circular-btn settings">
           <img src={settings} alt="Opciones" />
         </Link>
-      </div>
+      </div> : <div className="disconnected">Desconectado</div> }
 
       <h1>Dashboard</h1>
       <div className="main-buttons">
