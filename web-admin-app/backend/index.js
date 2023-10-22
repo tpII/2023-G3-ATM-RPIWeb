@@ -82,11 +82,13 @@ function mqttConfig() {
   const CASH_TOPIC = "cajero/efectivo"
   const REQUEST_PIN_TOPIC = "cajero/pin_request"
   const RESPONSE_PIN_TOPIC = "cajero/pin_response"
+  const STATUS_TOPIC = "cajero/status"
 
   mqttClient.on("connect", () => {
     console.log("Conectado correctamente al broker MQTT");
     mqttClient.subscribe(CASH_TOPIC)
     mqttClient.subscribe(REQUEST_PIN_TOPIC)
+    mqttClient.subscribe(STATUS_TOPIC)
   });
 
   // Al recibir publicación
@@ -101,6 +103,8 @@ function mqttConfig() {
       axios.get(`http://127.0.0.1:2000/api/cards/pin/${message}`)
         .then(res => mqttClient.publish(RESPONSE_PIN_TOPIC, res.data.pin.toString()))
         .catch(err => mqttClient.publish(RESPONSE_PIN_TOPIC, "-1"))
+    } else if (topic == STATUS_TOPIC){
+      console.log(message.toString() === "1" ? "Cajero en servicio" : "Cajero desconectado")
     }
   });
 

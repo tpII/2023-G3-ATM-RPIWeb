@@ -108,7 +108,10 @@ publishCash(efectivo)
 
 # MQTT Callbacks
 cliente.on_message = onReceiveMqttMessage
-cliente.loop_start()        
+cliente.loop_start()       
+
+# Informar estado activo de cajero
+cliente.publish("cajero/status", "1")
 
 # Loop
 try:
@@ -182,6 +185,7 @@ try:
                 estado = Estados.ESPERANDO_TARJETA
 
 except KeyboardInterrupt:
+    cliente.publish("cajero/status", "0")
     print("Cajero cerrado de manera voluntaria")
 except Exception as e:
     print("Cajero fuera de servicio")
