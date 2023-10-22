@@ -9,8 +9,10 @@ import random
 
 # ---- Clases ------------------------------
 class Estados(Enum):
+    MENU = 0
     ESPERANDO_TARJETA = 1
-    MENU = 2
+    CONOCIENDO_PIN = 2
+    INGRESO_PIN = 3
 
 
 class Sesion():
@@ -19,7 +21,9 @@ class Sesion():
     def __init__(self, id, text):
         self.id = id
         self.text = text
-        self.autenticado = False
+        self.pin = -1
+        self.pin_respondido = False
+        self.auth = False
 
 # -----------------------------------------------
 
@@ -27,53 +31,32 @@ class Sesion():
 CASH_TOPIC = "cajero/efectivo"
 MIN_TOPIC = "cajero/limite_min"
 MAX_TOPIC = "cajero/limite_max"
+PIN_REQUEST_TOPIC = "cajero/pin_request"
+PIN_RESPONSE_TOPIC = "cajero/pin_response"
 HOSTNAME = "192.168.0.27"
 
 # Variables globales
 extraccion_min = 1000
 extraccion_max = 50000
-pin_error = 0
-esperando = 1
-pin = -1
 
 # ---- Funciones ---------------------------------------------
 def readCard(reader):
     id, text = reader.read()
     return Sesion(id, text)
 
-def readPin(sesion, cliente):
-    # Solicitar PIN a MongoDB (vía MQTT)
-    publish.single("cajero/pin_request", sesion.id, hostname=HOSTNAME)
-    global esperando
-    global pin_error
-
-    esperando = 1
-
-    while esperando:
-       sleep(1)
-
-    if pin_error:
-        print("La tarjeta no está cargada en el sistema")
-        sleep(2)
-        return 0
-
-    # Leer digitos de teclado
-    pin_correcto = 0
+# Leer digitos de teclado
+def readPin(sesion):
     intentos_restantes = 3
 
-    while (not pin_correcto) and (intentos_restantes > 0):
+    while (not sesion.auth) and (intentos_restantes > 0):
         ingreso = input("Ingrese PIN:")
         pin_ingresado = try_parseInt(ingreso)
 
-        if pin_ingresado == pin:
-            pin_correcto = 1
-            return 1
+        # Comparar
+        if pin_ingresado == sesion.pin:
+            sesion.auth = True
         else:
             intentos_restantes = intentos_restantes - 1
-
-    # Se pasó de los intentos disponibles
-    print("Se alcanzó la máxima cantidad de intentos permitidos")
-    return 0
 
 def showMenu():
     print("1. Ingresar dinero")
@@ -102,14 +85,10 @@ def onReceiveMqttMessage(mosq, obj, msg):
         global extraccion_max
         extraccion_max = try_parseInt(msg.payload)
         print("Se actualizó el máximo de extracción: $", extraccion_max)
-    elif msg.topic == "cajero/pin_response":
-        global esperando
-        global pin_error
-        global pin
-
-        pin = try_parseInt(msg.payload)
-        pin_error = 1 if pin == -1 else 0
-        esperando = 0
+    elif msg.topic == PIN_RESPONSE_TOPIC:
+        global sesion
+        sesion.pin = try_parseInt(msg.payload)
+        sesion.pin_respondido = True
 
 # ----------------------------------------------------------
 
@@ -124,7 +103,7 @@ cliente = mqtt.Client(f'cajero-{random.randint(0, 100)}')
 cliente.connect(HOSTNAME)
 cliente.subscribe(MAX_TOPIC)
 cliente.subscribe(MIN_TOPIC)
-cliente.subscribe("cajero/pin_response")
+cliente.subscribe(PIN_RESPONSE_TOPIC)
 publishCash(efectivo)
 
 # MQTT Callbacks
@@ -137,21 +116,38 @@ try:
         if estado == Estados.ESPERANDO_TARJETA:
             print("Esperando tarjeta")
             sesion = readCard(lectorRfid)
-            exito = readPin(sesion, cliente)
+            publish.single(PIN_REQUEST_TOPIC, sesion.id, hostname=HOSTNAME)
+            estado = Estados.CONOCIENDO_PIN
 
-            if exito:
+        elif estado == Estados.CONOCIENDO_PIN:
+            if sesion.pin_respondido:
+                if sesion.pin == -1:
+                    print("La tarjeta no está registrada o habilitada en el sistema")
+                    estado = Estados.ESPERANDO_TARJETA
+                    sleep(2)
+                else:
+                    estado = Estados.INGRESO_PIN
+
+        elif estado == Estados.INGRESO_PIN:
+            readPin(sesion)
+
+            if (sesion.auth):
                 print("Bienvenido!")
                 estado = Estados.MENU
                 timesInMenu = 0
+            else:
+                print("Se alcanzó la máxima cantidad de intentos permitidos")
+                estado = Estados.ESPERANDO_TARJETA
+                sleep(2)
 
         elif estado == Estados.MENU:
             if timesInMenu == 0:
                 showMenu()
 
             timesInMenu = timesInMenu + 1
-            text = input()
+            opcion = input()
 
-            if text == "1":
+            if opcion == "1":
                 text = input("Ingrese el monto a ingresar: ")
                 monto = try_parseInt(text)
                 if (monto > 0):
@@ -161,7 +157,7 @@ try:
                 estado = Estados.MENU
                 timesInMenu = 0
                 
-            elif text == "2":
+            elif opcion == "2":
                 text = input("Ingrese el monto a retirar: ")
                 monto = try_parseInt(text)
                 if (monto > efectivo):
@@ -180,7 +176,7 @@ try:
                 estado = Estados.MENU
                 timesInMenu = 0
 
-            elif text == "0":
+            elif opcion == "0":
                 print("Puede retirar su tarjeta. Gracias por utilizar nuestro servicio")
                 sleep(3)
                 estado = Estados.ESPERANDO_TARJETA
