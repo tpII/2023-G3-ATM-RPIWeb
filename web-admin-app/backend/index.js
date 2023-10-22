@@ -100,7 +100,7 @@ function mqttConfig() {
       efectivo = parseFloat(message);
       miSocket?.emit("cash", { value: efectivo });
     } else if (topic === REQUEST_PIN_TOPIC) {
-      axios.get(`http://${MQTT_BROKER_IP}/api/cards/pin/${message}`)
+      axios.get(`http://${MQTT_BROKER_IP}:${BACKEND_PORT}/api/cards/pin/${message}`)
         .then(res => mqttClient.publish(RESPONSE_PIN_TOPIC, res.data.pin.toString()))
         .catch(err => mqttClient.publish(RESPONSE_PIN_TOPIC, "-1"))
     } else if (topic == STATUS_TOPIC){
