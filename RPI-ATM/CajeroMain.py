@@ -37,6 +37,8 @@ PIN_RESPONSE_TOPIC = "cajero/pin_response"
 STATUS_TOPIC = "cajero/status"
 MONTO_REQUEST_TOPIC = "cajero/monto_request"
 MONTO_RESPONSE_TOPIC = "cajero/monto_response"
+INGRESO_REQUEST_TOPIC = "cajero/ingreso_request"
+INGRESO_RESPONSE_TOPIC = "cajero/ingreso_response"
 HOSTNAME = "163.10.142.89"              # DE LA COMPUTADORA, NO LA RASPBERRY
 
 # ---- Funciones ---------------------------------------------
@@ -91,6 +93,8 @@ def onReceiveMqttMessage(mosq, obj, msg):
         sesion.pin_respondido = True
     elif msg.topic == MONTO_RESPONSE_TOPIC:
         montoCuenta = try_parseInt(msg.payload)
+    elif msg.topic == INGRESO_RESPONSE_TOPIC:
+        montoCuenta = try_parseInt(msg.payload)
 
 # ----------------------------------------------------------
 
@@ -112,6 +116,7 @@ cliente.subscribe(MAX_TOPIC)
 cliente.subscribe(MIN_TOPIC)
 cliente.subscribe(PIN_RESPONSE_TOPIC)
 cliente.subscribe(MONTO_RESPONSE_TOPIC)
+cliente.subscribe(INGRESO_RESPONSE_TOPIC)
 publishCash(efectivo)
 
 # MQTT Callbacks
@@ -176,7 +181,14 @@ try:
                 if (monto > 0):
                     efectivo = efectivo + monto
                     publishCash(efectivo)
-                    print("Operación realizada con éxito")
+                    cliente.publish(INGRESO_REQUEST_TOPIC, str(sesion.id) + "-" + text)
+
+                    while montoCuenta == -1:
+                        pass
+
+                    # se realizo la insercion
+                    print(f"Operación realizada con éxito. Monto en cuenta: {montoCuenta}")
+                    montoCuenta = -1
                 estado = Estados.MENU
                 timesInState = 0
                 

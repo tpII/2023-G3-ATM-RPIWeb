@@ -85,6 +85,8 @@ function mqttConfig() {
   const STATUS_TOPIC = "cajero/status"
   const MONTO_REQUEST_TOPIC = "cajero/monto_request"
   const MONTO_RESPONSE_TOPIC = "cajero/monto_response"
+  const INGRESO_REQUEST_TOPIC = "cajero/ingreso_request"
+  const INGRESO_RESPONSE_TOPIC = "cajero/ingreso_response"
 
   mqttClient.on("connect", () => {
     console.log("Conectado correctamente al broker MQTT");
@@ -92,6 +94,7 @@ function mqttConfig() {
     mqttClient.subscribe(REQUEST_PIN_TOPIC)
     mqttClient.subscribe(STATUS_TOPIC)
     mqttClient.subscribe(MONTO_REQUEST_TOPIC)
+    mqttClient.subscribe(INGRESO_REQUEST_TOPIC)
   });
 
   // Al recibir publicación
@@ -106,14 +109,21 @@ function mqttConfig() {
       axios.get(`http://${MQTT_BROKER_IP}:${BACKEND_PORT}/api/cards/pin/${message}`)
         .then(res => mqttClient.publish(RESPONSE_PIN_TOPIC, res.data.pin.toString()))
         .catch(err => mqttClient.publish(RESPONSE_PIN_TOPIC, "-1"))
-    } else if (topic == STATUS_TOPIC){
+    } else if (topic === STATUS_TOPIC){
       cajero_activo = message.toString() === "1"
       if (miSocket) console.log("Emitiendo estado via socket")
       miSocket?.emit('status', {value: cajero_activo})
-    } else if (topic == MONTO_REQUEST_TOPIC){
+    } else if (topic === MONTO_REQUEST_TOPIC){
       axios.get(`http://${MQTT_BROKER_IP}:${BACKEND_PORT}/api/cuentas/monto/${message}`)
         .then(res => mqttClient.publish(MONTO_RESPONSE_TOPIC, res.data.monto.toString()))
         .catch(err => mqttClient.publish(MONTO_RESPONSE_TOPIC, "-2"))
+    } else if (topic === INGRESO_REQUEST_TOPIC){
+      const partes = message.toString().split("-")
+      console.log("Partes del ingreso: ", partes[0], partes[1])
+
+      axios.post(`http://${MQTT_BROKER_IP}:${BACKEND_PORT}/api/cuentas/ingreso`, {tarjetaNro: partes[0], monto: partes[1]})
+        .then(res => mqttClient.publish(INGRESO_RESPONSE_TOPIC, res.data.monto.toString()))
+        .catch(err => mqttClient.publish(INGRESO_RESPONSE_TOPIC, "-2"))
     }
   });
 
