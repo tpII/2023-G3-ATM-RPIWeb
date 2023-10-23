@@ -1,13 +1,15 @@
 // Importar modelo
 const model = require('../models/cuenta');
+const tarjetaModel = require('../models/card')
 
 // Definir controlador (funciones disponibles)
 const controller = {
 
     getMonto: async(req, res) => {
-        const clienteId = req.params.cliente
+        const tarjetaNro = req.params.tarjeta
 
-        const monto = await model.findOne({cliente: clienteId}, 'monto -_id')
+        const tarjeta = await tarjetaModel.findOne({nro: tarjetaNro})
+        const monto = await model.findOne({tarjeta: tarjeta._id}, 'monto -_id')
         return monto ? res.status(200).json(monto) : res.status(400).json({message: "No se encontró cuenta"})
     },
 

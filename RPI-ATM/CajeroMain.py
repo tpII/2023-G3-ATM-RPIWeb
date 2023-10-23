@@ -35,6 +35,8 @@ MAX_TOPIC = "cajero/limite_max"
 PIN_REQUEST_TOPIC = "cajero/pin_request"
 PIN_RESPONSE_TOPIC = "cajero/pin_response"
 STATUS_TOPIC = "cajero/status"
+MONTO_REQUEST_TOPIC = "cajero/monto_request"
+MONTO_RESPONSE_TOPIC = "cajero/monto_response"
 HOSTNAME = "163.10.142.89"              # DE LA COMPUTADORA, NO LA RASPBERRY
 
 # ---- Funciones ---------------------------------------------
@@ -75,6 +77,7 @@ def publishCash(cash):
 def onReceiveMqttMessage(mosq, obj, msg):
     global limites
     global sesion
+    global montoCuenta
 
     if msg.topic == MIN_TOPIC:
         limites.extraccion_min = try_parseInt(msg.payload)
@@ -86,6 +89,8 @@ def onReceiveMqttMessage(mosq, obj, msg):
     elif msg.topic == PIN_RESPONSE_TOPIC:
         sesion.pin = try_parseInt(msg.payload)
         sesion.pin_respondido = True
+    elif msg.topic == MONTO_RESPONSE_TOPIC:
+        montoCuenta = try_parseInt(msg.payload)
 
 # ----------------------------------------------------------
 
@@ -94,6 +99,7 @@ lectorRfid = SimpleMFRC522()
 estado = Estados.ESPERANDO_TARJETA
 timesInState = 0
 efectivo = 2000
+montoCuenta = -1
 
 # Cargar preferencias
 limites = LimitesConfig()
@@ -105,6 +111,7 @@ cliente.connect(HOSTNAME)
 cliente.subscribe(MAX_TOPIC)
 cliente.subscribe(MIN_TOPIC)
 cliente.subscribe(PIN_RESPONSE_TOPIC)
+cliente.subscribe(MONTO_RESPONSE_TOPIC)
 publishCash(efectivo)
 
 # MQTT Callbacks
@@ -193,7 +200,14 @@ try:
                 timesInState = 0
 
             elif opcion == "3":
-                print("Su saldo es...")
+                cliente.publish(MONTO_REQUEST_TOPIC, sesion.id)
+
+                while montoCuenta == -1:
+                    pass
+
+                # se recibio response
+                print(f"Su saldo es {montoCuenta}")
+                montoCuenta = -1
                 estado = Estados.MENU
                 timesInState = 0
 

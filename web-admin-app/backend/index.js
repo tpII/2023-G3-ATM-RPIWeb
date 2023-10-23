@@ -83,12 +83,15 @@ function mqttConfig() {
   const REQUEST_PIN_TOPIC = "cajero/pin_request"
   const RESPONSE_PIN_TOPIC = "cajero/pin_response"
   const STATUS_TOPIC = "cajero/status"
+  const MONTO_REQUEST_TOPIC = "cajero/monto_request"
+  const MONTO_RESPONSE_TOPIC = "cajero/monto_response"
 
   mqttClient.on("connect", () => {
     console.log("Conectado correctamente al broker MQTT");
     mqttClient.subscribe(CASH_TOPIC)
     mqttClient.subscribe(REQUEST_PIN_TOPIC)
     mqttClient.subscribe(STATUS_TOPIC)
+    mqttClient.subscribe(MONTO_REQUEST_TOPIC)
   });
 
   // Al recibir publicación
@@ -107,6 +110,10 @@ function mqttConfig() {
       cajero_activo = message.toString() === "1"
       if (miSocket) console.log("Emitiendo estado via socket")
       miSocket?.emit('status', {value: cajero_activo})
+    } else if (topic == MONTO_REQUEST_TOPIC){
+      axios.get(`http://${MQTT_BROKER_IP}:${BACKEND_PORT}/api/cuentas/monto/${message}`)
+        .then(res => mqttClient.publish(MONTO_RESPONSE_TOPIC, res.data.monto.toString()))
+        .catch(err => mqttClient.publish(MONTO_RESPONSE_TOPIC, "-2"))
     }
   });
 
