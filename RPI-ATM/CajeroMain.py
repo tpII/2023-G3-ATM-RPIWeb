@@ -39,6 +39,8 @@ MONTO_REQUEST_TOPIC = "cajero/monto_request"
 MONTO_RESPONSE_TOPIC = "cajero/monto_response"
 INGRESO_REQUEST_TOPIC = "cajero/ingreso_request"
 INGRESO_RESPONSE_TOPIC = "cajero/ingreso_response"
+RETIRO_REQUEST_TOPIC = "cajero/retiro_request"
+RETIRO_RESPONSE_TOPIC = "cajero/retiro_response"
 HOSTNAME = "163.10.142.89"              # DE LA COMPUTADORA, NO LA RASPBERRY
 
 # ---- Funciones ---------------------------------------------
@@ -95,6 +97,9 @@ def onReceiveMqttMessage(mosq, obj, msg):
         montoCuenta = try_parseInt(msg.payload)
     elif msg.topic == INGRESO_RESPONSE_TOPIC:
         montoCuenta = try_parseInt(msg.payload)
+    elif msg.topic == RETIRO_RESPONSE_TOPIC:
+        montoCuenta = try_parseInt(msg.payload)
+
 
 # ----------------------------------------------------------
 
@@ -117,6 +122,7 @@ cliente.subscribe(MIN_TOPIC)
 cliente.subscribe(PIN_RESPONSE_TOPIC)
 cliente.subscribe(MONTO_RESPONSE_TOPIC)
 cliente.subscribe(INGRESO_RESPONSE_TOPIC)
+cliente.subscribe(RETIRO_RESPONSE_TOPIC)
 publishCash(efectivo)
 
 # MQTT Callbacks
@@ -207,7 +213,17 @@ try:
                 elif (monto > 0):
                     efectivo = efectivo - monto
                     publishCash(efectivo)
-                    print("Operación realizada con éxito")
+                    cliente.publish(RETIRO_REQUEST_TOPIC, str(sesion.id) + "-" + text)
+
+                    while montoCuenta == -1:
+                        pass
+
+                    # se realizo la insercion
+                    if (montoCuenta == -2):
+                        print("Saldo mayor al actual: operacion no realizada")
+                    else:
+                        print(f"Operación realizada con éxito. Monto en cuenta: {montoCuenta}")
+                    montoCuenta = -1
                 estado = Estados.MENU
                 timesInState = 0
 

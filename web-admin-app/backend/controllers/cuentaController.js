@@ -24,6 +24,19 @@ const controller = {
         return doc ? res.status(200).json({monto: doc.monto}) : res.status(400).json({message: "Error al actualizar monto"})
     },
 
+    retirarMonto: async(req, res) => {
+        const {tarjetaNro, monto} = req.body
+
+        const tarjeta = await tarjetaModel.findOne({nro: tarjetaNro})
+        const cuenta = await model.findOne({tarjeta: tarjeta._id})
+        const nuevoMonto = parseInt(cuenta.monto) - parseInt(monto)
+        if (nuevoMonto< 0 ){
+            return res.status(400).json({message: "Error en retiro saldo mayor al actual"})
+        }
+
+        const doc = await model.findByIdAndUpdate(cuenta._id, {monto: nuevoMonto}, {new: true})
+        return doc ? res.status(200).json({monto: doc.monto}) : res.status(400).json({message: "Error al actualizar monto"})
+    },
 
     replaceMonto: async(req, res) => {
         const cuentaId = req.params.id
