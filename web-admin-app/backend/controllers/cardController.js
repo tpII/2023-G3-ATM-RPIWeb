@@ -92,6 +92,8 @@ const controller = {
         if (!doc) return res.status(400).json({message: "ID no encontrado en la base de datos"})
 
         const result = await doc.deleteOne()
+        const cuenta = await cuentaModel.findOne({tarjeta: id})
+        await cuenta.deleteOne()
         return result ? res.json(result) : res.status(400).json({message: "Error al borrar"}) 
     }
 }
