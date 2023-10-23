@@ -35,7 +35,7 @@ MAX_TOPIC = "cajero/limite_max"
 PIN_REQUEST_TOPIC = "cajero/pin_request"
 PIN_RESPONSE_TOPIC = "cajero/pin_response"
 STATUS_TOPIC = "cajero/status"
-HOSTNAME = "192.168.0.27"
+HOSTNAME = "163.10.142.89"              # DE LA COMPUTADORA, NO LA RASPBERRY
 
 # ---- Funciones ---------------------------------------------
 def readCard(reader):
@@ -59,7 +59,7 @@ def readPin(sesion):
 def showMenu():
     print("1. Ingresar dinero")
     print("2. Retirar efectivo")
-    #print("3. Consultar saldo")
+    print("3. Consultar saldo")
     #print("4. Realizar transacción")
     print("0. Finalizar")
 
@@ -82,6 +82,7 @@ def onReceiveMqttMessage(mosq, obj, msg):
     elif msg.topic == MAX_TOPIC:
         limites.extraccion_max = try_parseInt(msg.payload)
         print("Se actualizó el máximo de extracción: $", limites.extraccion_max)
+        limites.guardar()
     elif msg.topic == PIN_RESPONSE_TOPIC:
         sesion.pin = try_parseInt(msg.payload)
         sesion.pin_respondido = True
@@ -188,6 +189,11 @@ try:
                     efectivo = efectivo - monto
                     publishCash(efectivo)
                     print("Operación realizada con éxito")
+                estado = Estados.MENU
+                timesInState = 0
+
+            elif opcion == "3":
+                print("Su saldo es...")
                 estado = Estados.MENU
                 timesInState = 0
 

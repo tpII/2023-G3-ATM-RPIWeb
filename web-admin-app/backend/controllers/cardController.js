@@ -1,5 +1,6 @@
 // Importar modelo
 const model = require('../models/card');
+const cuentaModel = require('../models/cuenta')
 
 // Definir controlador (funciones disponibles)
 const controller = {
@@ -32,8 +33,17 @@ const controller = {
             ban: false,
         })
         const savedCard = await newCard.save()
-        res.json(savedCard);
         
+        // También creamos la cuenta asociada
+        const nuevaCuenta = new cuentaModel({
+            cliente: clienteSeleccionado,
+            tarjeta: savedCard._id,
+            tipo: "Cuenta corriente en pesos",
+            monto: 0.00
+        })
+
+        await nuevaCuenta.save()
+        res.json(savedCard);
     },
 
     // Inserta una tarjeta con los datos elementales (desde cajero)
