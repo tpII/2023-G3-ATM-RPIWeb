@@ -146,8 +146,6 @@ class MEF_Cajero():
 
                 if (monto > 0):
                     self.clienteMqtt.publish(Constantes.INGRESO_REQUEST_TOPIC, str(self.sesion.id) + "-" + text)
-                    self.efectivo = self.efectivo + monto
-                    self.publishCash()
                     self.simulateOperation()
 
                     # Esperar respuesta de backend
@@ -157,11 +155,11 @@ class MEF_Cajero():
                     # En caso de error, el backend responde "-2"
                     if self.montoCuenta == -2:
                         print("No se pudo completar la operación. Devolviendo el dinero ingresado", end=' ')
-                        self.efectivo = self.efectivo - monto
-                        self.publishCash()
                         self.simulateOperation()
                     else:
                         print(f"Operación realizada con éxito. Monto en cuenta: {self.montoCuenta}")
+                        self.efectivo = self.efectivo + monto
+                        self.publishCash()
 
                     self.montoCuenta = -1
 
@@ -182,17 +180,20 @@ class MEF_Cajero():
                     sleep(2)
                 elif (monto > 0):
                     self.clienteMqtt.publish(Constantes.RETIRO_REQUEST_TOPIC, str(self.sesion.id) + "-" + text)
-                    self.efectivo = self.efectivo - monto
-                    self.publishCash()
-
+                    
+                    # Esperar respuesta del backend
                     while self.montoCuenta == -1:
                         pass
 
-                    # Una vez procesado por el backend
+                    # En caso de error, backend responde "-2"
                     if (self.montoCuenta == -2):
                         print("Extracción mayor al saldo disponible. Operación no realizada")
+                        sleep(2)
                     else:
                         print(f"Operación realizada con éxito. Monto en cuenta: {self.montoCuenta}")
+                        self.efectivo = self.efectivo - monto
+                        self.publishCash()
+                    
                     self.montoCuenta = -1
 
                 self.changeToState(Estados.MENU)
