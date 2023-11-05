@@ -47,6 +47,16 @@ class MEF_Cajero():
     def publishCash(self):
         self.clienteMqtt.publish(Constantes.CASH_TOPIC, str(self.efectivo), retain=True)
 
+    # Suma efectivo al cajero y lo publica vía MQTT
+    def addCash(self, monto):
+        self.efectivo = self.efectivo + monto
+        self.publishCash()
+
+    # Resta efectivo al cajero y lo publica vía MQTT
+    def removeCash(self, monto):
+        self.efectivo = self.efectivo - monto
+        self.publishCash()
+
     # Lectura de tarjeta RFID
     def readCard(self) -> Sesion:
         id, text = self.lectorRfid.read()
@@ -158,8 +168,7 @@ class MEF_Cajero():
                         self.simulateOperation()
                     else:
                         print(f"Operación realizada con éxito. Monto en cuenta: {self.montoCuenta}")
-                        self.efectivo = self.efectivo + monto
-                        self.publishCash()
+                        self.addCash(monto)
 
                     self.montoCuenta = -1
 
@@ -180,7 +189,8 @@ class MEF_Cajero():
                     sleep(2)
                 elif (monto > 0):
                     self.clienteMqtt.publish(Constantes.RETIRO_REQUEST_TOPIC, str(self.sesion.id) + "-" + text)
-                    
+                    self.simulateOperation()
+
                     # Esperar respuesta del backend
                     while self.montoCuenta == -1:
                         pass
@@ -191,8 +201,7 @@ class MEF_Cajero():
                         sleep(2)
                     else:
                         print(f"Operación realizada con éxito. Monto en cuenta: {self.montoCuenta}")
-                        self.efectivo = self.efectivo - monto
-                        self.publishCash()
+                        self.removeCash(monto)
                     
                     self.montoCuenta = -1
 
@@ -200,12 +209,20 @@ class MEF_Cajero():
 
             elif opcion == "3":
                 self.clienteMqtt.publish(Constantes.MONTO_REQUEST_TOPIC, self.sesion.id)
+                self.simulateOperation()
 
+                # Esperar respuesta del backend
                 while self.montoCuenta == -1:
                     pass
 
-                # Una vez procesado por el backend
-                print(f"Su saldo es {self.montoCuenta}")
+                # En caso de error, backend responde "-2"
+                if (self.montoCuenta == -2):
+                    print("No se pudo completar la operación")
+                    sleep(1)
+                else:
+                    print(f"Su saldo es {self.montoCuenta}")
+                    sleep(1)
+                    
                 self.montoCuenta = -1
                 self.changeToState(Estados.MENU)
 
