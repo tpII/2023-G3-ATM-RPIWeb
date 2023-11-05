@@ -89,6 +89,15 @@ class MEF_Cajero():
         #print("4. Realizar transacción")
         print("0. Finalizar")
 
+    # Simular tiempo imprimiendo puntos en una misma línea
+    def simulateOperation():
+        print('...', end=' ')
+        sleep(0.5)
+        print('...', end=' ')
+        sleep(0.5)
+        print('...', end=' ')
+        sleep(0.5)
+
     # Actualización de estado
     def update(self):
         if self.estado == Estados.ESPERANDO_TARJETA:
@@ -132,19 +141,28 @@ class MEF_Cajero():
             opcion = input()
 
             if opcion == "1":
-                text = input("Ingrese el monto a ingresar: ")
+                text = input("Ingrese el monto a depositar: ")
                 monto = Utils.try_parseInt(text)
 
                 if (monto > 0):
                     self.clienteMqtt.publish(Constantes.INGRESO_REQUEST_TOPIC, str(self.sesion.id) + "-" + text)
                     self.efectivo = self.efectivo + monto
                     self.publishCash()
+                    self.simulateOperation()
 
+                    # Esperar respuesta de backend
                     while self.montoCuenta == -1:
                         pass
 
-                    # Una vez persistido en la db
-                    print(f"Operación realizada con éxito. Monto en cuenta: {self.montoCuenta}")
+                    # En caso de error, el backend responde "-2"
+                    if self.montoCuenta == -2:
+                        print("No se pudo completar la operación. Devolviendo el dinero ingresado", end=' ')
+                        self.efectivo = self.efectivo - monto
+                        self.publishCash()
+                        self.simulateOperation()
+                    else:
+                        print(f"Operación realizada con éxito. Monto en cuenta: {self.montoCuenta}")
+
                     self.montoCuenta = -1
 
                 self.changeToState(Estados.MENU)
