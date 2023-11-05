@@ -13,7 +13,7 @@ class GUI():
         self.ventana = tkinter.Tk()
         self.bgColor = bgColor
         self.textColor = textColor
-        self.variableText = tkinter.StringVar()
+        self.mainVarText = tkinter.StringVar()
         self.hourVarText = tkinter.StringVar()
 
         # Título, dimensiones y color de fondo
@@ -22,7 +22,7 @@ class GUI():
         self.ventana.configure(bg=self.bgColor)
 
         # Texto centrado
-        mainText = tkinter.Label(self.ventana, textvariable=self.variableText, font=14, pady=150, 
+        mainText = tkinter.Label(self.ventana, textvariable=self.mainVarText, font=14, pady=150, 
                               bg=self.bgColor, fg=self.textColor)
         mainText.pack()
 
@@ -31,21 +31,17 @@ class GUI():
                                  bg=self.bgColor, fg=self.textColor)
         hourText.pack(side="bottom")
 
-        # Updater
+        # Actualizador de textos
         self.updater()
 
     # Actualiza el texto centrado de la ventana con el mensaje pasado por parámetro
     def print(self, message):
-        self.variableText.set(message)
-
-    def update(self):
-        self.ventana.update_idletasks()
-        self.ventana.update()
+        self.mainVarText.set(message)
 
     def updater(self):
         # Actualización de variables...
         now = datetime.now()
-        date_time = now.strftime("%m/%d/%Y \t\t\t\t %H:%M:%S")
+        date_time = now.strftime("%d/%m/%Y \t\t\t\t %H:%M:%S")
         self.hourVarText.set(date_time)
         self.ventana.after(UPDATE_RATE_MS, self.updater)
 
