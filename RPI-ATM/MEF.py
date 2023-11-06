@@ -1,6 +1,7 @@
 # Máquina de estados finito del cajero RPI
 from time import sleep                  # Delay
 from enum import Enum                   # Enumerativos
+import os
 
 from Preferencias import LimitesConfig
 import Constantes                       # Nombres de tópicos MQTT
@@ -92,7 +93,7 @@ class MEF_Cajero():
         self.limites.guardar()
 
     # Impresión del menú de opciones
-    def showMenu():
+    def showMenu(self):
         print("1. Ingresar dinero")
         print("2. Retirar efectivo")
         print("3. Consultar saldo")
@@ -100,12 +101,15 @@ class MEF_Cajero():
         print("0. Finalizar")
 
     # Simular tiempo imprimiendo puntos en una misma línea
-    def simulateOperation():
-        print('...', end=' ')
-        sleep(0.5)
-        print('...', end=' ')
-        sleep(0.5)
-        print('...', end=' ')
+    def simulateOperation(self):
+        os.system('clear')
+        print('.')
+        sleep(1)
+        os.system('clear')
+        print('..')
+        sleep(1)
+        os.system('clear')
+        print('...')
         sleep(0.5)
 
     # Actualización de estado
