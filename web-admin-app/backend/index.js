@@ -5,6 +5,7 @@ const mqtt = require("mqtt");
 const http = require("http");
 const cors = require("cors"); // CORS para evitar error 'Access-Control-Allow-Origin'
 const { Server } = require("socket.io");
+const axios = require('axios')
 
 // Importaciones de APIs
 const userApi = require("./routes/userApi");
@@ -24,6 +25,7 @@ const LOCALHOST = "127.0.0.1";
 const DB_NAME = "atm-db";
 
 // Variables globales
+let cajero_activo = false
 let efectivo = 0.0;
 let mqttClient;
 let miSocket;
@@ -54,9 +56,8 @@ app.use("/api/moves", moveApi);
 app.use("/api/cuentas", cuentaApi);
 
 // APIs MQTT
-app.use("/api/cash", (req, res) => {
-  res.json({ value: efectivo });
-});
+app.use("/api/status", (req, res) => res.json({value: cajero_activo}))
+app.use("/api/cash", (req, res) => res.json({ value: efectivo }))
 
 // Envío de nuevos limites de extracción
 app.post("/api/settings/limites", (req, res) => {
@@ -78,23 +79,59 @@ server.listen(BACKEND_PORT, () => {
 
 function mqttConfig() {
   mqttClient = mqtt.connect(`mqtt://${MQTT_BROKER_IP}:${MQTT_PORT}`);
+  const CASH_TOPIC = "cajero/efectivo"
+  const REQUEST_PIN_TOPIC = "cajero/pin_request"
+  const RESPONSE_PIN_TOPIC = "cajero/pin_response"
+  const STATUS_TOPIC = "cajero/status"
+  const MONTO_REQUEST_TOPIC = "cajero/monto_request"
+  const MONTO_RESPONSE_TOPIC = "cajero/monto_response"
+  const INGRESO_REQUEST_TOPIC = "cajero/ingreso_request"
+  const INGRESO_RESPONSE_TOPIC = "cajero/ingreso_response"
+  const RETIRO_REQUEST_TOPIC = "cajero/retiro_request"
+  const RETIRO_RESPONSE_TOPIC = "cajero/retiro_response"
 
   mqttClient.on("connect", () => {
     console.log("Conectado correctamente al broker MQTT");
-
-    // Suscribirse al tema
-    mqttClient.subscribe("cajero/efectivo")
+    mqttClient.subscribe(CASH_TOPIC)
+    mqttClient.subscribe(REQUEST_PIN_TOPIC)
+    mqttClient.subscribe(STATUS_TOPIC)
+    mqttClient.subscribe(MONTO_REQUEST_TOPIC)
+    mqttClient.subscribe(INGRESO_REQUEST_TOPIC)
+    mqttClient.subscribe(RETIRO_REQUEST_TOPIC)
   });
 
   // Al recibir publicación
   mqttClient.on("message", (topic, message) => {
     console.log(`Mensaje recibido en el tema ${topic}: ${message.toString()}`);
 
-    // Actualizar efectivo
-    if (topic === "cajero/efectivo") {
+    // Filtrar por tema
+    if (topic === CASH_TOPIC) {
       efectivo = parseFloat(message);
-
       miSocket?.emit("cash", { value: efectivo });
+    } else if (topic === REQUEST_PIN_TOPIC) {
+      axios.get(`http://${MQTT_BROKER_IP}:${BACKEND_PORT}/api/cards/pin/${message}`)
+        .then(res => mqttClient.publish(RESPONSE_PIN_TOPIC, res.data.pin.toString()))
+        .catch(err => mqttClient.publish(RESPONSE_PIN_TOPIC, "-1"))
+    } else if (topic === STATUS_TOPIC){
+      cajero_activo = message.toString() === "1"
+      if (miSocket) console.log("Emitiendo estado via socket")
+      miSocket?.emit('status', {value: cajero_activo})
+    } else if (topic === MONTO_REQUEST_TOPIC){
+      axios.get(`http://${MQTT_BROKER_IP}:${BACKEND_PORT}/api/cuentas/monto/${message}`)
+        .then(res => mqttClient.publish(MONTO_RESPONSE_TOPIC, res.data.monto.toString()))
+        .catch(err => mqttClient.publish(MONTO_RESPONSE_TOPIC, "-2"))
+    } else if (topic === INGRESO_REQUEST_TOPIC){
+      const partes = message.toString().split("-")
+
+      axios.post(`http://${MQTT_BROKER_IP}:${BACKEND_PORT}/api/cuentas/ingreso`, {tarjetaNro: partes[0], monto: partes[1]})
+        .then(res => mqttClient.publish(INGRESO_RESPONSE_TOPIC, res.data.monto.toString()))
+        .catch(err => mqttClient.publish(INGRESO_RESPONSE_TOPIC, "-2"))
+    }else if (topic === RETIRO_REQUEST_TOPIC){
+      const partes = message.toString().split("-")
+
+      axios.post(`http://${MQTT_BROKER_IP}:${BACKEND_PORT}/api/cuentas/retiro`, {tarjetaNro: partes[0], monto: partes[1]})
+        .then(res => mqttClient.publish(RETIRO_RESPONSE_TOPIC, res.data.monto.toString()))
+        .catch(err => mqttClient.publish(RETIRO_RESPONSE_TOPIC, "-2"))
     }
   });
 

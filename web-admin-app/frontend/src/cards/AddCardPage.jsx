@@ -33,8 +33,8 @@ function AddCardPage() {
     // Control de parámetros
     if (!clienteSeleccionado) return;
     
-    if (nro.length < 16) {
-      alert("Número de tarjeta debe tener 16 dígitos")
+    if (nro.length < 12) {
+      alert("Número de tarjeta debe tener al menos 12 dígitos")
       return
     }
 

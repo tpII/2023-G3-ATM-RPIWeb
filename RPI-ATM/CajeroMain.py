@@ -1,128 +1,69 @@
-# Importaciones
+# Importaciones de librerias
 from time import sleep                  # Delay
-from enum import Enum                   # Enumerativos
 from mfrc522 import SimpleMFRC522       # Lector RFID
 import paho.mqtt.publish as publish     # MQTT Python
 import paho.mqtt.client as mqtt
 import RPi.GPIO as GPIO                 # Pines RPI
 import random
 
-# Clases
-class Estados(Enum):
-    ESPERANDO_TARJETA = 1
-    MENU = 2
+# Importaciones del mismo directorio
+from MEF import MEF_Cajero
+import Constantes
+import Utils
 
-# Constantes globales
-CASH_TOPIC = "cajero/efectivo"
-MIN_TOPIC = "cajero/limite_min"
-MAX_TOPIC = "cajero/limite_max"
-HOSTNAME = "192.168.0.27"
+HOSTNAME = "163.10.142.89"              # DE LA COMPUTADORA, NO LA RASPBERRY
 
-# Variables globales
-extraccion_min = 1000
-extraccion_max = 50000
-
-# ---- Funciones ---------------------------------------------
-def readCard(reader):
-    reader.read()
-
-def showMenu():
-    print("1. Ingresar dinero")
-    print("2. Retirar efectivo")
-    #print("3. Consultar saldo")
-    #print("4. Realizar transacción")
-    print("0. Finalizar")
-
-def try_parseInt(text):
-    try:
-        return int(text)
-    except:
-        return 0
+# ---- MQTT Callbacks ---------------------------------------------
     
-def publishCash(cash):
-    publish.single(CASH_TOPIC, payload=str(cash), hostname=HOSTNAME)
-
 def onReceiveMqttMessage(mosq, obj, msg):
-    if msg.topic == MIN_TOPIC:
-        global extraccion_min
-        extraccion_min = try_parseInt(msg.payload)
-        print("Se actualizó el mínimo de extracción: $", extraccion_min)
-    elif msg.topic == MAX_TOPIC:
-        global extraccion_max
-        extraccion_max = try_parseInt(msg.payload)
-        print("Se actualizó el máximo de extracción: $", extraccion_max)
+    global mef
+
+    if msg.topic == Constantes.MIN_TOPIC:
+        mef.limites.extraccion_min = Utils.try_parseInt(msg.payload)
+        print("Se actualizó el mínimo de extracción: $", mef.limites.extraccion_min)
+    elif msg.topic == Constantes.MAX_TOPIC:
+        mef.limites.extraccion_max = Utils.try_parseInt(msg.payload)
+        print("Se actualizó el máximo de extracción: $", mef.limites.extraccion_max)
+        mef.limites.guardar()
+    elif msg.topic == Constantes.PIN_RESPONSE_TOPIC:
+        mef.sesion.pin = Utils.try_parseInt(msg.payload)
+        mef.sesion.pin_respondido = True
+    elif msg.topic == Constantes.MONTO_RESPONSE_TOPIC:
+        mef.montoCuenta = Utils.try_parseInt(msg.payload)
+    elif msg.topic == Constantes.INGRESO_RESPONSE_TOPIC:
+        mef.montoCuenta = Utils.try_parseInt(msg.payload)
+    elif msg.topic == Constantes.RETIRO_RESPONSE_TOPIC:
+        mef.montoCuenta = Utils.try_parseInt(msg.payload)
 
 # ----------------------------------------------------------
 
 # Setup
 lectorRfid = SimpleMFRC522()
-estado = Estados.ESPERANDO_TARJETA
-timesInMenu = 0
-efectivo = 2000
 
 # Conexión MQTT
-cliente = mqtt.Client(f'session-{random.randint(0, 100)}')
+cliente = mqtt.Client(f'cajero-{random.randint(0, 100)}')
 cliente.connect(HOSTNAME)
-cliente.subscribe(MAX_TOPIC)
-cliente.subscribe(MIN_TOPIC)
-publishCash(efectivo)
+cliente.subscribe(Constantes.MAX_TOPIC)
+cliente.subscribe(Constantes.MIN_TOPIC)
+cliente.subscribe(Constantes.PIN_RESPONSE_TOPIC)
+cliente.subscribe(Constantes.MONTO_RESPONSE_TOPIC)
+cliente.subscribe(Constantes.INGRESO_RESPONSE_TOPIC)
+cliente.subscribe(Constantes.RETIRO_RESPONSE_TOPIC)
 
 # MQTT Callbacks
 cliente.on_message = onReceiveMqttMessage
-cliente.loop_start()        
+cliente.loop_start()       
+
+# Iniciar MEF
+mef = MEF_Cajero(cliente, lectorRfid)
+mef.start()
 
 # Loop
 try:
     while 1:
-        if estado == Estados.ESPERANDO_TARJETA:
-            print("Esperando tarjeta")
-            readCard(lectorRfid)
-            print("Bienvenido!")
-            estado = Estados.MENU
-            timesInMenu = 0
-
-        elif estado == Estados.MENU:
-            if timesInMenu == 0:
-                showMenu()
-
-            timesInMenu = timesInMenu + 1
-            text = input()
-
-            if text == "1":
-                text = input("Ingrese el monto a ingresar: ")
-                monto = try_parseInt(text)
-                if (monto > 0):
-                    efectivo = efectivo + monto
-                    publishCash(efectivo)
-                    print("Operación realizada con éxito")
-                estado = Estados.MENU
-                timesInMenu = 0
-                
-            elif text == "2":
-                text = input("Ingrese el monto a retirar: ")
-                monto = try_parseInt(text)
-                if (monto > efectivo):
-                    print("No hay dinero suficiente en cajero. Disculpe las molestias")
-                    sleep(2)
-                elif (monto < extraccion_min):
-                    print("El monto mínimo para extraer es $", extraccion_min)
-                    sleep(2)
-                elif (monto > extraccion_max):
-                    print("El monto máximo para extraer es $", extraccion_max)
-                    sleep(2)
-                elif (monto > 0):
-                    efectivo = efectivo - monto
-                    publishCash(efectivo)
-                    print("Operación realizada con éxito")
-                estado = Estados.MENU
-                timesInMenu = 0
-
-            elif text == "0":
-                print("Puede retirar su tarjeta. Gracias por utilizar nuestro servicio")
-                sleep(3)
-                estado = Estados.ESPERANDO_TARJETA
-
+        mef.update()
 except KeyboardInterrupt:
+    mef.stop()
     print("Cajero cerrado de manera voluntaria")
 except Exception as e:
     print("Cajero fuera de servicio")
