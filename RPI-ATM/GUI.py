@@ -4,6 +4,7 @@ from datetime import datetime           # Hora actual
 import tkinter
 
 UPDATE_RATE_MS = 1000
+DEFAULT_TEXT_PADY = 150
 
 # Clase GUI
 class GUI():
@@ -17,15 +18,14 @@ class GUI():
         self.hourVarText = tkinter.StringVar()
         self.running = 1
 
-        # Título, dimensiones y color de fondo
-        self.ventana.title("Cajero RPI")
-        self.ventana.geometry('600x400')
-        self.ventana.configure(bg=self.bgColor)
+        self.ventana.title("Cajero RPI")            # Título
+        self.ventana.geometry('600x400')            # Dimensiones
+        self.ventana.configure(bg=self.bgColor)     # Color de fondo
 
         # Texto centrado
-        mainText = tkinter.Label(self.ventana, textvariable=self.mainVarText, font=14, pady=150, 
-                              bg=self.bgColor, fg=self.textColor)
-        mainText.pack()
+        self.mainText = tkinter.Label(self.ventana, textvariable=self.mainVarText, font=14, 
+                                      pady=DEFAULT_TEXT_PADY, bg=self.bgColor, fg=self.textColor)
+        self.mainText.pack()
 
         # Texto de hora actual
         hourText = tkinter.Label(self.ventana, textvariable=self.hourVarText, font=12, 
@@ -49,19 +49,22 @@ class GUI():
         self.ventana.destroy()
         self.running = 0
 
-    # Muestra la entrada de texto
+    # Muestra el componente Entry
     def showEntry(self):
         self.entryText.place(x=170, y=263)
 
-    # Oculta la entrada de texto
+    # Borra el texto ingresado y oculta el Entry
     def hideEntry(self):
-        self.entryText.pack_forget()
+        self.entryText.delete(0, 'end')
+        self.entryText.place_forget()
 
     # Chequeo de ingreso
     def checkEntry(self):
         entrada = self.entryText.get()
         if entrada == '1234':
-            self.showText("Bienvenido!")
+            self.hideEntry()
+            self.hideButton()
+            self.showMenuView()
         else:
             self.showText("PIN incorrecto")
 
@@ -71,7 +74,7 @@ class GUI():
 
     # Oculta el botón OK
     def hideButton(self):
-        self.button.pack_forget()
+        self.button.place_forget()
 
     # Actualiza el texto centrado de la ventana con el mensaje pasado por parámetro
     def showText(self, message):
@@ -93,6 +96,42 @@ class GUI():
         self.ventana.update()
         self.ventana.update_idletasks()
 
+    # ---- VISTAS --------------------------------------------
+
+    def showPinRequest(self):
+        self.showText("Ingrese PIN")
+        self.showEntry()
+        self.showButton()
+
+    def showMenuView(self):
+        self.showText("Bienvenido!")
+        self.mainText.config(pady=50)
+
+        # Construir botones de opción
+        self.b1 = tkinter.Button(self.ventana, text="Consultar saldo", width=15)
+        self.b2 = tkinter.Button(self.ventana, text="Ingresar dinero", width=15)
+        self.b3 = tkinter.Button(self.ventana, text="Retirar dinero", width=15)
+        self.b4 = tkinter.Button(self.ventana, text="Terminar", width=15, command=self.onFinishSession)
+
+        # Coordenadas
+        self.b1.place(x=100, y=140)
+        self.b2.place(x=350, y=140)
+        self.b3.place(x=100, y=270)
+        self.b4.place(x=350, y=270)
+
+    # ---- CLICK ACTIONS -------------------------------------------------
+
+    # Oculta los botones del menú y recupera la posición original del texto
+    def onFinishSession(self):
+        self.b1.destroy()
+        self.b2.destroy()
+        self.b3.destroy()
+        self.b4.destroy()
+        self.mainText.config(pady=DEFAULT_TEXT_PADY)
+        self.showPinRequest()
+
+    # --------------------------------------------------------------------
+
 # Programa test
 gui = GUI(bgColor='blue', textColor='white')
 gui.showText("Iniciando...")
@@ -106,9 +145,7 @@ while gui.running:
         gui.showText("Esperando tarjeta")
 
     if ticks == 300:
-        gui.showText("Ingrese PIN")
-        gui.showEntry()
-        gui.showButton()
+        gui.showPinRequest()
 
     if ticks < 1000:
         ticks = ticks + 1
