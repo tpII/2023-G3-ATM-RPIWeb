@@ -98,6 +98,10 @@ class GUI():
 
     # ---- VISTAS --------------------------------------------
 
+    def showWaitingCardView(self):
+        self.showText("Esperando tarjeta")
+        self.ventana.after(2000, self.showPinRequest)
+
     def showPinRequest(self):
         self.showText("Ingrese PIN")
         self.showEntry()
@@ -128,7 +132,7 @@ class GUI():
         self.b3.destroy()
         self.b4.destroy()
         self.mainText.config(pady=DEFAULT_TEXT_PADY)
-        self.showPinRequest()
+        self.showWaitingCardView()
 
     # --------------------------------------------------------------------
 
@@ -142,10 +146,10 @@ while gui.running:
     gui.update()
 
     if ticks == 100:
-        gui.showText("Esperando tarjeta")
+        gui.showWaitingCardView()
 
-    if ticks == 300:
-        gui.showPinRequest()
+    #if ticks == 300:
+    #    gui.showPinRequest()
 
     if ticks < 1000:
         ticks = ticks + 1
