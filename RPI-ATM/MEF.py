@@ -1,6 +1,7 @@
 # Máquina de estados finito del cajero RPI
 from time import sleep                  # Delay
 from enum import Enum                   # Enumerativos
+import os
 
 from Preferencias import LimitesConfig
 import Constantes                       # Nombres de tópicos MQTT
@@ -47,6 +48,16 @@ class MEF_Cajero():
     def publishCash(self):
         self.clienteMqtt.publish(Constantes.CASH_TOPIC, str(self.efectivo), retain=True)
 
+    # Suma efectivo al cajero y lo publica vía MQTT
+    def addCash(self, monto):
+        self.efectivo = self.efectivo + monto
+        self.publishCash()
+
+    # Resta efectivo al cajero y lo publica vía MQTT
+    def removeCash(self, monto):
+        self.efectivo = self.efectivo - monto
+        self.publishCash()
+
     # Lectura de tarjeta RFID
     def readCard(self) -> Sesion:
         id, text = self.lectorRfid.read()
@@ -82,12 +93,24 @@ class MEF_Cajero():
         self.limites.guardar()
 
     # Impresión del menú de opciones
-    def showMenu():
+    def showMenu(self):
         print("1. Ingresar dinero")
         print("2. Retirar efectivo")
         print("3. Consultar saldo")
         #print("4. Realizar transacción")
         print("0. Finalizar")
+
+    # Simular tiempo imprimiendo puntos en una misma línea
+    def simulateOperation(self):
+        os.system('clear')
+        print('.')
+        sleep(1)
+        os.system('clear')
+        print('..')
+        sleep(1)
+        os.system('clear')
+        print('...')
+        sleep(0.5)
 
     # Actualización de estado
     def update(self):
@@ -132,19 +155,25 @@ class MEF_Cajero():
             opcion = input()
 
             if opcion == "1":
-                text = input("Ingrese el monto a ingresar: ")
+                text = input("Ingrese el monto a depositar: ")
                 monto = Utils.try_parseInt(text)
 
                 if (monto > 0):
                     self.clienteMqtt.publish(Constantes.INGRESO_REQUEST_TOPIC, str(self.sesion.id) + "-" + text)
-                    self.efectivo = self.efectivo + monto
-                    self.publishCash()
+                    self.simulateOperation()
 
+                    # Esperar respuesta de backend
                     while self.montoCuenta == -1:
                         pass
 
-                    # Una vez persistido en la db
-                    print(f"Operación realizada con éxito. Monto en cuenta: {self.montoCuenta}")
+                    # En caso de error, el backend responde "-2"
+                    if self.montoCuenta == -2:
+                        print("No se pudo completar la operación. Devolviendo el dinero ingresado", end=' ')
+                        self.simulateOperation()
+                    else:
+                        print(f"Operación realizada con éxito. Monto en cuenta: {self.montoCuenta}")
+                        self.addCash(monto)
+
                     self.montoCuenta = -1
 
                 self.changeToState(Estados.MENU)
@@ -164,29 +193,40 @@ class MEF_Cajero():
                     sleep(2)
                 elif (monto > 0):
                     self.clienteMqtt.publish(Constantes.RETIRO_REQUEST_TOPIC, str(self.sesion.id) + "-" + text)
-                    self.efectivo = self.efectivo - monto
-                    self.publishCash()
+                    self.simulateOperation()
 
+                    # Esperar respuesta del backend
                     while self.montoCuenta == -1:
                         pass
 
-                    # Una vez procesado por el backend
+                    # En caso de error, backend responde "-2"
                     if (self.montoCuenta == -2):
                         print("Extracción mayor al saldo disponible. Operación no realizada")
+                        sleep(2)
                     else:
                         print(f"Operación realizada con éxito. Monto en cuenta: {self.montoCuenta}")
+                        self.removeCash(monto)
+                    
                     self.montoCuenta = -1
 
                 self.changeToState(Estados.MENU)
 
             elif opcion == "3":
                 self.clienteMqtt.publish(Constantes.MONTO_REQUEST_TOPIC, self.sesion.id)
+                self.simulateOperation()
 
+                # Esperar respuesta del backend
                 while self.montoCuenta == -1:
                     pass
 
-                # Una vez procesado por el backend
-                print(f"Su saldo es {self.montoCuenta}")
+                # En caso de error, backend responde "-2"
+                if (self.montoCuenta == -2):
+                    print("No se pudo completar la operación")
+                    sleep(1)
+                else:
+                    print(f"Su saldo es {self.montoCuenta}")
+                    sleep(1)
+                    
                 self.montoCuenta = -1
                 self.changeToState(Estados.MENU)
 
