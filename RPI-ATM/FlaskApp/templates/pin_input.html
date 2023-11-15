@@ -8,6 +8,8 @@
     <title>Cajero RPI</title>
 </head>
 <body>
-    <h1>Esperando tarjeta...</h1>
+    <h1 id="hint">{{ message }}</h1>
+    <h1 id="pin">- - - -</h1>
+    <script src="{{ url_for('static', filename='js/pin_input.js') }}"></script>
 </body>
 </html>
