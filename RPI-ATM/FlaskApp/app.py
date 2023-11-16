@@ -1,9 +1,11 @@
-from flask import Flask, render_template, jsonify, url_for, redirect, send_file
+from flask import Flask, render_template, jsonify, redirect, request
 from time import sleep
 import threading
 
 app = Flask(__name__)
 card_read = False
+
+DEFAULT_PIN = "1234"
 
 # ---- VISTAS --------------------------------------
 
@@ -21,10 +23,23 @@ def pin_input():
         return redirect('/')
     else:
         return render_template('pin_input.html', message="Ingrese PIN")
+    
+@app.route("/menu")
+def menu():
+    return render_template('menu.html')
+
+# ---- API REQUESTS --------------------------------------
 
 @app.route("/status")
 def status():
     return jsonify(dict(status=('ready' if card_read else 'waiting')))
+
+@app.route("/pin-process", methods=['POST'])
+def pin_process():
+    data = request.get_json()
+    pin_ingresado = data['pin']
+    print("PIN ingresado:", pin_ingresado)
+    return jsonify(result = "1" if pin_ingresado == DEFAULT_PIN else "0")
 
 # ---- TAREAS DE SEGUNDO PLANO -------------------
 

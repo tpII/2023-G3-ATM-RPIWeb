@@ -5,6 +5,7 @@ let attempts_left = 3
 
 // HTML elements
 let pin_text = document.getElementById("pin")
+let hint_text = document.getElementById("hint")
 
 // Keyboard listener
 document.addEventListener('keydown', (event) => {
@@ -23,19 +24,37 @@ document.addEventListener('keydown', (event) => {
         showPin()
         keydownSound()
     } else if (name == 'Enter') {
-        current_pin = Array(4).fill(-1)
-        current_index = 0
-        showPin()
         keydownSound()
+        if (current_index == 4) processPin()
+        current_index = 0
+        current_pin = Array(4).fill(-1)
+        showPin()
     }
 })
 
 function showPin(){
-    let text = current_pin.map(digit => (digit == -1 ? "-" : "*")).join(' ')
+    const text = current_pin.map(digit => (digit == -1 ? "-" : "*")).join(' ')
     pin_text.innerText = text
 }
 
 function keydownSound(){
-    let sound = new Audio("/static/audio/keydown.mp3")
+    const sound = new Audio("/static/audio/keydown.mp3")
     sound.play()
+}
+
+async function processPin(){
+    const response = await fetch("pin-process", {
+        method: 'POST',
+        body: JSON.stringify({
+            pin: current_pin.map(digit => `${digit}`).join('')
+        }),
+        headers: {
+            "Content-type": "application/json; charset=UTF-8"
+        }
+    });
+
+    const data = await response.json()
+    
+    if (data.result == '1') window.location.replace('menu')
+    else hint_text.innerText = "PIN incorrecto. Intente nuevamente:"
 }
