@@ -8,6 +8,19 @@
     <title>Cajero RPI</title>
 </head>
 <body>
-    <h1>Menú</h1>
+    <div class="top-title">
+        <h1>Menú</h1>
+    </div>
+    <div class="menu-content">
+        <div class="button-row">
+            <button id="saldo-btn">Consultar saldo</button>
+            <button id="ingresar-btn">Ingresar dinero</button>
+        </div>
+        <div class="button-row">
+            <button id="retirar-btn">Retirar dinero</button>
+            <button id="terminar-btn" onclick="finish_session()">Terminar</button>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/menu.js') }}"></script>
 </body>
 </html>
