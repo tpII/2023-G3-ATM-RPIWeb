@@ -1,84 +1,67 @@
 from flask import Flask, render_template, jsonify, redirect, request
-from enum import Enum                   # Enumerativos
 from time import sleep
 import threading
 
-class Estados(Enum):
-    MENU = 0
-    ESPERANDO_TARJETA = 1
-    CONOCIENDO_PIN = 2
-    INGRESO_PIN = 3
+# Clases propias
+from Estados import Estados
+from MEF import MEF
 
 app = Flask(__name__)
-current_state = Estados.ESPERANDO_TARJETA
-
+mef = MEF()
 DEFAULT_PIN = "1234"
 
 # ---- VISTAS --------------------------------------
 
 @app.route("/")
 def home():
-    if current_state == Estados.ESPERANDO_TARJETA:
-        return redirect('waiting-card')
-    if current_state == Estados.INGRESO_PIN: 
-        return redirect('pin-input')
-    if current_state == Estados.MENU:
-        return redirect('menu')
+    return redirect(mef.getCurrentView())
 
 @app.route("/waiting-card")
 def waiting_card():
-    if (current_state != Estados.ESPERANDO_TARJETA):
-        return redirect('/')
-    else:
+    if mef.isCurrentView("waiting-card"):
         return render_template('waiting_card.html', message="Esperando tarjeta...")
+    else:
+        return redirect('/')
 
 @app.route("/pin-input")
 def pin_input():
-    if (current_state != Estados.INGRESO_PIN):
-        return redirect('/')
-    else:
+    if mef.isCurrentView("pin-input"):
         return render_template('pin_input.html', message="Ingrese PIN")
+    else:
+        return redirect('/')
     
 @app.route("/menu")
 def menu():
-    if (current_state == Estados.MENU):
+    if mef.isCurrentView("menu"):
         return render_template('menu.html')
     else:
         return redirect('/')
     
 @app.route("/finish-session")
 def finish_session():
-    global current_state
-    current_state = Estados.ESPERANDO_TARJETA
+    mef.update(entry_x = 1)
     return redirect("/")
 
 # ---- API REQUESTS --------------------------------------
 
 @app.route("/status")
 def status():
-    return jsonify(dict(status=('ready' if current_state == Estados.INGRESO_PIN else 'waiting')))
+    return jsonify(status = 'ready' if mef.current_state == Estados.INGRESO_PIN else 'waiting')
 
 @app.route("/pin-process", methods=['POST'])
 def pin_process():
-    global current_state
     data = request.get_json()
     pin_ingresado = data['pin']
     
-    if pin_ingresado == DEFAULT_PIN:
-        current_state = Estados.MENU
-        return jsonify(result = "1")
-    else:
-        return jsonify(result = "0")
+    mef.update(entry_x = 1 if pin_ingresado == DEFAULT_PIN else 0)
+    return jsonify(result = mef.getCurrentView())
 
 # ---- TAREAS DE SEGUNDO PLANO -------------------
 
 def backgroundLoop():
-    global current_state
-
     while 1:
-        sleep(8)
-        if current_state == Estados.ESPERANDO_TARJETA: 
-            current_state = Estados.INGRESO_PIN
+        sleep(1)
+        mef.update()
 
 # -------------------------------------------------
 

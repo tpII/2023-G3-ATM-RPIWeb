@@ -13,12 +13,12 @@
     </div>
     <div class="menu-content">
         <div class="button-row">
-            <button id="saldo-btn">Consultar saldo</button>
-            <button id="ingresar-btn">Ingresar dinero</button>
+            <button onclick="consultar_saldo()">Consultar saldo</button>
+            <button onclick="ingresar_dinero()">Ingresar dinero</button>
         </div>
         <div class="button-row">
-            <button id="retirar-btn">Retirar dinero</button>
-            <button id="terminar-btn" onclick="finish_session()">Terminar</button>
+            <button onclick="retirar_dinero()">Retirar dinero</button>
+            <button onclick="finish_session()">Terminar</button>
         </div>
     </div>
     <script src="{{ url_for('static', filename='js/menu.js') }}"></script>

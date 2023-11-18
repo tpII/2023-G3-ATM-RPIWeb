@@ -55,6 +55,6 @@ async function processPin(){
 
     const data = await response.json()
     
-    if (data.result == '1') window.location.replace('menu')
-    else hint_text.innerText = "PIN incorrecto. Intente nuevamente:"
+    if (data.result == 'pin-input') hint_text.innerText = "PIN incorrecto. Intente nuevamente:"
+    else window.location.replace(data.result)
 }
