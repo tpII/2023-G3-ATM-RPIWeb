@@ -1,15 +1,33 @@
 from Estados import Estados
+import Constantes
 
 # Constantes
 STATE_PAGES = ["menu", "waiting-card", "pin-ack", "pin-input", "option-saldo"]
 
+class Sesion():
+
+    # Constructor
+    def __init__(self, id, text):
+        self.id = id
+        self.text = text
+        self.pin = -1
+        self.pin_respondido = False
+        self.auth = False
+
 class MEF():
     
     # Constructor
-    def __init__(self):
+    def __init__(self, lectorRfid, clienteMQTT):
         self.current_state = Estados.ESPERANDO_TARJETA
         self.times_in_state = 0
         self.attempts = 0
+        self.efectivo = 2000
+
+    def start(self, lectorRfid, clienteMQTT):
+        self.lectorRfid = lectorRfid
+        self.clienteMQTT = clienteMQTT
+        self.clienteMqtt.publish(Constantes.STATUS_TOPIC, "1", retain=True)
+        self.clienteMqtt.publish(Constantes.CASH_TOPIC, str(self.efectivo), retain=True)
 
     def changeToState(self, newState):
         self.current_state = newState
@@ -24,8 +42,24 @@ class MEF():
     def update(self, entry_x = -1):
 
         if (self.current_state == Estados.ESPERANDO_TARJETA):
-            if (self.times_in_state >= 8):
-                self.changeToState(Estados.INGRESO_PIN)
+            id, text = self.lectorRfid.read()
+            self.sesion = Sesion(id, text)
+            self.clienteMqtt.publish(Constantes.PIN_REQUEST_TOPIC, self.sesion.id)
+            self.changeToState(Estados.CONOCIENDO_PIN)
+
+            # if (self.times_in_state >= 8):
+            #    self.changeToState(Estados.INGRESO_PIN)
+
+        elif (self.current_state == Estados.CONOCIENDO_PIN):
+            if self.sesion.pin_respondido:
+                if self.sesion.pin == -1:
+                    print("La tarjeta no está registrada o habilitada en el sistema")
+                    self.changeToState(Estados.ESPERANDO_TARJETA)
+                else:
+                    self.changeToState(Estados.INGRESO_PIN)
+            elif self.times_in_state == 5:
+                print("No hubo respuesta por parte del servidor. Puede retirar su tarjeta")
+                self.changeToState(Estados.ESPERANDO_TARJETA)
 
         elif (self.current_state == Estados.INGRESO_PIN):
             if entry_x == 0:

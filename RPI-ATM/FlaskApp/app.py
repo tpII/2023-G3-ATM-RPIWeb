@@ -2,14 +2,25 @@ from flask import Flask, render_template, jsonify, redirect, request
 from datetime import datetime           # Hora actual
 from time import sleep
 import threading
+import random
+
+# Librerias GPIO, RFID y MQTT
+from mfrc522 import SimpleMFRC522       # Lector RFID
+import paho.mqtt.publish as publish     # MQTT Python
+import paho.mqtt.client as mqtt
+import RPi.GPIO as GPIO                 # Pines RPI
 
 # Clases propias
 from Estados import Estados
 from MEF import MEF
+import Constantes
+import Utils
+
+# Constantes
+HOSTNAME = "163.10.142.89"              # DE LA COMPUTADORA, NO LA RASPBERRY
 
 app = Flask(__name__)
 mef = MEF()
-DEFAULT_PIN = "1234"
 
 # ---- VISTAS --------------------------------------
 
@@ -23,6 +34,10 @@ def waiting_card():
         return render_template('waiting_card.html', message="Esperando tarjeta...")
     else:
         return redirect('/')
+    
+@app.route("/pin-ack")
+def pin_ack():
+    return render_template('waiting-card.html', message= "Por favor, espere...")
 
 @app.route("/pin-input")
 def pin_input():
@@ -64,7 +79,7 @@ def pin_process():
     data = request.get_json()
     pin_ingresado = data['pin']
     
-    mef.update(entry_x = 1 if pin_ingresado == DEFAULT_PIN else 0)
+    mef.update(entry_x = 1 if pin_ingresado == mef.sesion.pin else 0)
     return jsonify(result = mef.getCurrentView())
 
 @app.route("/menu/select_option", methods=['POST'])
@@ -74,9 +89,47 @@ def menu_select_option():
     mef.update(entry_x = int(option))
     return jsonify(result = mef.getCurrentView())
 
+# ---- MQTT Callbacks ---------------------------------------------
+    
+def onReceiveMqttMessage(mosq, obj, msg):
+    #if msg.topic == Constantes.MIN_TOPIC:
+    #    mef.limites.extraccion_min = Utils.try_parseInt(msg.payload)
+    #    print("Se actualizó el mínimo de extracción: $", mef.limites.extraccion_min)
+    #elif msg.topic == Constantes.MAX_TOPIC:
+    #    mef.limites.extraccion_max = Utils.try_parseInt(msg.payload)
+    #    print("Se actualizó el máximo de extracción: $", mef.limites.extraccion_max)
+    #    mef.limites.guardar()
+    if msg.topic == Constantes.PIN_RESPONSE_TOPIC:
+        mef.sesion.pin = Utils.try_parseInt(msg.payload)
+        mef.sesion.pin_respondido = True
+    elif msg.topic == Constantes.MONTO_RESPONSE_TOPIC:
+        mef.montoCuenta = Utils.try_parseInt(msg.payload)
+    elif msg.topic == Constantes.INGRESO_RESPONSE_TOPIC:
+        mef.montoCuenta = Utils.try_parseInt(msg.payload)
+    elif msg.topic == Constantes.RETIRO_RESPONSE_TOPIC:
+        mef.montoCuenta = Utils.try_parseInt(msg.payload)
+
 # ---- TAREAS DE SEGUNDO PLANO -------------------
 
 def backgroundLoop():
+    # Setup 
+    lectorRfid = SimpleMFRC522()
+
+    # Conexión MQTT
+    cliente = mqtt.Client(f'cajero-{random.randint(0, 100)}')
+    cliente.connect(HOSTNAME)
+    cliente.subscribe(Constantes.MAX_TOPIC)
+    cliente.subscribe(Constantes.MIN_TOPIC)
+    cliente.subscribe(Constantes.PIN_RESPONSE_TOPIC)
+    cliente.subscribe(Constantes.MONTO_RESPONSE_TOPIC)
+    cliente.subscribe(Constantes.INGRESO_RESPONSE_TOPIC)
+    cliente.subscribe(Constantes.RETIRO_RESPONSE_TOPIC)
+
+    cliente.loop_start()  
+
+    mef.start(lectorRfid, cliente)
+
+    # Loop
     while 1:
         sleep(1)
         mef.update()
