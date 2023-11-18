@@ -1,4 +1,5 @@
 from flask import Flask, render_template, jsonify, redirect, request
+from datetime import datetime           # Hora actual
 from time import sleep
 import threading
 
@@ -37,8 +38,12 @@ def menu():
     else:
         return redirect('/')
     
-@app.route("/finish-session")
-def finish_session():
+@app.route("/option-saldo")
+def consulta_saldo():
+    return render_template("consulta_saldo.html")
+
+@app.route("/menu/return")
+def return_to_menu():
     mef.update(entry_x = 1)
     return redirect("/")
 
@@ -48,12 +53,25 @@ def finish_session():
 def status():
     return jsonify(status = 'ready' if mef.current_state == Estados.INGRESO_PIN else 'waiting')
 
+@app.route("/datetime")
+def get_datetime():
+    now = datetime.now()
+    date_time = now.strftime("%d/%m/%Y - %H:%M")
+    return jsonify(text = date_time)
+
 @app.route("/pin-process", methods=['POST'])
 def pin_process():
     data = request.get_json()
     pin_ingresado = data['pin']
     
     mef.update(entry_x = 1 if pin_ingresado == DEFAULT_PIN else 0)
+    return jsonify(result = mef.getCurrentView())
+
+@app.route("/menu/select_option", methods=['POST'])
+def menu_select_option():
+    data = request.get_json()
+    option = data['option_number']
+    mef.update(entry_x = int(option))
     return jsonify(result = mef.getCurrentView())
 
 # ---- TAREAS DE SEGUNDO PLANO -------------------

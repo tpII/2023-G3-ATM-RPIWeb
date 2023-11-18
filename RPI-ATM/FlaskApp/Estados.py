@@ -5,3 +5,4 @@ class Estados(Enum):
     ESPERANDO_TARJETA = 1
     CONOCIENDO_PIN = 2
     INGRESO_PIN = 3
+    MUESTRA_SALDO = 4

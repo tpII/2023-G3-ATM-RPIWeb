@@ -1,7 +1,7 @@
 from Estados import Estados
 
 # Constantes
-STATE_PAGES = ["menu", "waiting-card", "pin-ack", "pin-input"]
+STATE_PAGES = ["menu", "waiting-card", "pin-ack", "pin-input", "option-saldo"]
 
 class MEF():
     
@@ -39,6 +39,12 @@ class MEF():
 
         elif (self.current_state == Estados.MENU):
             if entry_x == 1:
+                self.changeToState(Estados.MUESTRA_SALDO)
+            if entry_x == 4:
                 self.changeToState(Estados.ESPERANDO_TARJETA)
+
+        elif (self.current_state == Estados.MUESTRA_SALDO):
+            if entry_x == 1:
+                self.changeToState(Estados.MENU)
 
         self.times_in_state = self.times_in_state + 1
