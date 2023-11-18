@@ -6,7 +6,8 @@ const schema = new mongoose.Schema({
   cliente: ObjectId,
   tarjeta: ObjectId,
   tipo: String,
-  monto: Number
+  monto: Number,
+  cbu: Number
 });
 
 // Crea un modelo a partir del esquema

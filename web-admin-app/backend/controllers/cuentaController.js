@@ -37,6 +37,11 @@ const controller = {
 
         const doc = await model.findByIdAndUpdate(cuenta._id, {monto: nuevoMonto}, {new: true})
         return doc ? res.status(200).json({monto: doc.monto}) : res.status(400).json({message: "Error al actualizar monto"})
+    },
+
+    getLastCBU: async(req, res) => {
+        const lastCBU = await model.find().sort({ cbu: -1}).limit(1)
+        return lastCBU ? res.status(200).json({cbu: lastCBU}) : res.status(200).json({cbu: 0})
     }
 
 }

@@ -32,14 +32,20 @@ const controller = {
             cvv: cvv,
             ban: false,
         })
-        const savedCard = await newCard.save()
+        const savedCard = await newCard.save() 
         
         // También creamos la cuenta asociada
+        const lastCBU = await cuentaModel.find({}, "cbu -_id").sort({ cbu: -1}).limit(1)
+        const nuevoCBU = lastCBU ? (lastCBU[0].cbu + 1) : 1
+
+        console.log(lastCBU, nuevoCBU)
+ 
         const nuevaCuenta = new cuentaModel({
             cliente: clienteSeleccionado,
             tarjeta: savedCard._id,
             tipo: "Cuenta corriente en pesos",
-            monto: 0.00
+            monto: 0.00,
+            cbu: nuevoCBU
         })
 
         await nuevaCuenta.save()
