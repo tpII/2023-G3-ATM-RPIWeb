@@ -6,3 +6,4 @@ class Estados(Enum):
     CONOCIENDO_PIN = 2
     INGRESO_PIN = 3
     MUESTRA_SALDO = 4
+    ERROR = 5

@@ -29,6 +29,10 @@ mef = MEF()
 def home():
     return redirect(mef.getCurrentView())
 
+@app.route("/error")
+def error():
+    return render_template('error.html', message=mef.error)
+
 @app.route("/waiting-card")
 def waiting_card():
     if mef.isCurrentView("waiting-card"):
@@ -38,7 +42,7 @@ def waiting_card():
     
 @app.route("/pin-ack")
 def pin_ack():
-    return render_template('waiting-card.html', message= "Por favor, espere...")
+    return render_template('waiting_card.html', message= "Por favor, espere...")
 
 @app.route("/pin-input")
 def pin_input():
@@ -58,16 +62,16 @@ def menu():
 def consulta_saldo():
     return render_template("consulta_saldo.html")
 
-@app.route("/menu/return")
-def return_to_menu():
-    mef.update(entry_x = 1)
+@app.route("/forward")
+def forward():
+    mef.update(entry_x=1)
     return redirect("/")
 
 # ---- API REQUESTS --------------------------------------
 
 @app.route("/status")
 def status():
-    return jsonify(status = 'ready' if mef.current_state == Estados.INGRESO_PIN else 'waiting')
+    return jsonify(status = 'ready' if mef.current_state != Estados.ESPERANDO_TARJETA else 'waiting')
 
 @app.route("/datetime")
 def get_datetime():
@@ -79,7 +83,7 @@ def get_datetime():
 def pin_process():
     data = request.get_json()
     pin_ingresado = data['pin']
-    print("Se ingresó el PIN", pin_ingresado)
+    print("PIN ingresado:", pin_ingresado)
     
     mef.update(entry_x = 1 if pin_ingresado == str(mef.sesion.pin) else 0)
     return jsonify(result = mef.getCurrentView())
@@ -104,7 +108,6 @@ def onReceiveMqttMessage(mosq, obj, msg):
     if msg.topic == Constantes.PIN_RESPONSE_TOPIC:
         mef.sesion.pin = Utils.try_parseInt(msg.payload)
         mef.sesion.pin_respondido = True
-        print("El PIN de la tarjeta es", mef.sesion.pin)
     elif msg.topic == Constantes.MONTO_RESPONSE_TOPIC:
         mef.montoCuenta = Utils.try_parseInt(msg.payload)
     elif msg.topic == Constantes.INGRESO_RESPONSE_TOPIC:
