@@ -22,7 +22,8 @@ class MEF():
         self.times_in_state = 0
         self.attempts = 0
         self.efectivo = 2000
-        self.error = ""
+        self.montoCuenta = -1
+        self.message = ""
 
     def start(self, lectorRfid, clienteMqtt):
         self.lectorRfid = lectorRfid
@@ -51,19 +52,19 @@ class MEF():
         elif (self.current_state == Estados.CONOCIENDO_PIN):
             if self.sesion.pin_respondido:
                 if self.sesion.pin == -1:
-                    self.error = "La tarjeta no está registrada o habilitada en el sistema"
+                    self.message = "La tarjeta no está registrada o habilitada en el sistema"
                     self.changeToState(Estados.ERROR)
                 else:
                     self.changeToState(Estados.INGRESO_PIN)
             elif self.times_in_state == 5:
-                self.error = "No hubo respuesta por parte del servidor. Puede retirar su tarjeta"
+                self.message = "No hubo respuesta por parte del servidor. Puede retirar su tarjeta"
                 self.changeToState(Estados.ERROR)
 
         elif (self.current_state == Estados.INGRESO_PIN):
             if entry_x == 0:
                 self.attempts = self.attempts + 1
                 if self.attempts == 3:
-                    self.error = "Se alcanzó la máxima cantidad de intentos permitidos"
+                    self.message = "Se alcanzó la máxima cantidad de intentos permitidos"
                     self.changeToState(Estados.ERROR)
                     self.attempts = 0
             elif entry_x == 1:
@@ -72,6 +73,7 @@ class MEF():
 
         elif (self.current_state == Estados.MENU):
             if entry_x == 1:
+                self.clienteMqtt.publish(Constantes.MONTO_REQUEST_TOPIC, self.sesion.id)
                 self.changeToState(Estados.MUESTRA_SALDO)
             if entry_x == 4:
                 self.changeToState(Estados.ESPERANDO_TARJETA)

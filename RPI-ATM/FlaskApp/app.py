@@ -7,8 +7,7 @@ import sys                              # Argumentos por consola
 
 # Librerias GPIO, RFID y MQTT
 from mfrc522 import SimpleMFRC522       # Lector RFID
-import paho.mqtt.publish as publish     # MQTT Python
-import paho.mqtt.client as mqtt
+import paho.mqtt.client as mqtt         # MQTT Python
 import RPi.GPIO as GPIO                 # Pines RPI
 
 # Clases propias
@@ -31,7 +30,7 @@ def home():
 
 @app.route("/error")
 def error():
-    return render_template('error.html', message=mef.error)
+    return render_template('error.html', message=mef.message)
 
 @app.route("/waiting-card")
 def waiting_card():
@@ -94,6 +93,19 @@ def menu_select_option():
     option = data['option_number']
     mef.update(entry_x = int(option))
     return jsonify(result = mef.getCurrentView())
+
+@app.route("/api/monto")
+def api_get_monto():
+
+    # Esperar respuesta del backend
+    while mef.montoCuenta == -1:
+        pass
+
+    # En caso de error, backend responde "-2"
+    if (mef.montoCuenta == -2):
+        return jsonify(success=0, msg="No se pudo completar la operación")
+    else:
+        return jsonify(success=1, value=mef.montoCuenta)
 
 # ---- MQTT Callbacks ---------------------------------------------
     

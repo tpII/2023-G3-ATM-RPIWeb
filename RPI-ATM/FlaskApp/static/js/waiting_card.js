@@ -5,8 +5,8 @@ async function handler() {
     console.log(data)
 
     if (data.status == 'ready') {
-        window.location.replace('pin-input')
+        window.location.replace('/')
     }
 }
 
-setInterval(handler, 1000)
+setInterval(handler, 1500)
