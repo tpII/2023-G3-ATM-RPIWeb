@@ -17,15 +17,15 @@ class Sesion():
 class MEF():
     
     # Constructor
-    def __init__(self, lectorRfid, clienteMQTT):
+    def __init__(self):
         self.current_state = Estados.ESPERANDO_TARJETA
         self.times_in_state = 0
         self.attempts = 0
         self.efectivo = 2000
 
-    def start(self, lectorRfid, clienteMQTT):
+    def start(self, lectorRfid, clienteMqtt):
         self.lectorRfid = lectorRfid
-        self.clienteMQTT = clienteMQTT
+        self.clienteMqtt = clienteMqtt
         self.clienteMqtt.publish(Constantes.STATUS_TOPIC, "1", retain=True)
         self.clienteMqtt.publish(Constantes.CASH_TOPIC, str(self.efectivo), retain=True)
 

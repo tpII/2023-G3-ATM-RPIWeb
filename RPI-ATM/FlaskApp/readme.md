@@ -1,7 +1,18 @@
 # Aplicación Flask en Raspberry Pi
 
-## Ejecución en Raspberry Pi
-Instalar Flask vía ```sudo apt install python3-flask``` y luego ejecutar la app: ```python3 app.py```. De esta manera, la interfaz sencilla del cajero se puede acceder desde otros dispositivos usando un navegador web: ```192.168.0.28:5000```
+## Instalación en Raspberry Pi
+Se deben realizar los siguientes pasos. Referencia: https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/
+
+1. Crear entorno virtual de Python mediante: `python3 -m venv .venv`
+2. Activar entorno virtual: `source .venv/bin/activate`
+3. Actualizar PIP: `python3 -m install --upgrade pip`
+4. Instalar Flask: `python3 -m install Flask`
+5. Instalar MRFC522: `python3 -m install mrfc522`
+6. Instalar Paho-MQTT: `python3 -m install paho-mqtt`
+7. Ejecutar aplicación: `python3 app.py [IP_WINDOWS]`
+
+Al terminar, se debe cerrar el entorno virtual con el comando `deactivate`
+
 
 ## Intérprete en Windows
 Durante el desarrollo, el intérprete para VSCode funcionará correctamente si:

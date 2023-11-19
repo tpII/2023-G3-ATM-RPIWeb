@@ -3,6 +3,7 @@ from datetime import datetime           # Hora actual
 from time import sleep
 import threading
 import random
+import sys                              # Argumentos por consola
 
 # Librerias GPIO, RFID y MQTT
 from mfrc522 import SimpleMFRC522       # Lector RFID
@@ -17,7 +18,7 @@ import Constantes
 import Utils
 
 # Constantes
-HOSTNAME = "163.10.142.89"              # DE LA COMPUTADORA, NO LA RASPBERRY
+HOSTNAME = sys.argv[1]              # DE LA COMPUTADORA, NO LA RASPBERRY
 
 app = Flask(__name__)
 mef = MEF()
@@ -78,8 +79,9 @@ def get_datetime():
 def pin_process():
     data = request.get_json()
     pin_ingresado = data['pin']
+    print("Se ingresó el PIN", pin_ingresado)
     
-    mef.update(entry_x = 1 if pin_ingresado == mef.sesion.pin else 0)
+    mef.update(entry_x = 1 if pin_ingresado == str(mef.sesion.pin) else 0)
     return jsonify(result = mef.getCurrentView())
 
 @app.route("/menu/select_option", methods=['POST'])
@@ -102,6 +104,7 @@ def onReceiveMqttMessage(mosq, obj, msg):
     if msg.topic == Constantes.PIN_RESPONSE_TOPIC:
         mef.sesion.pin = Utils.try_parseInt(msg.payload)
         mef.sesion.pin_respondido = True
+        print("El PIN de la tarjeta es", mef.sesion.pin)
     elif msg.topic == Constantes.MONTO_RESPONSE_TOPIC:
         mef.montoCuenta = Utils.try_parseInt(msg.payload)
     elif msg.topic == Constantes.INGRESO_RESPONSE_TOPIC:
@@ -125,6 +128,8 @@ def backgroundLoop():
     cliente.subscribe(Constantes.INGRESO_RESPONSE_TOPIC)
     cliente.subscribe(Constantes.RETIRO_RESPONSE_TOPIC)
 
+    # Asignar callbacks
+    cliente.on_message = onReceiveMqttMessage
     cliente.loop_start()  
 
     mef.start(lectorRfid, cliente)
@@ -142,4 +147,4 @@ if __name__ == "__main__":
 
     # Hacerlo accesible desde otros dispositivos
     # Si debug se deja en True, se crean 2 background threads
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=False)
