@@ -6,6 +6,6 @@ setTimeout(() => {
 fetch("api/monto").then(response => {
     response.json().then(data => {
         if (data.success == "0") document.getElementById("title").innerText = data.msg
-        else document.getElementById("value").innerText = "$" + data.value.toFixed(2)
+        else document.getElementById("value").innerText = "$" + data.msg.toFixed(2)
     })
 })

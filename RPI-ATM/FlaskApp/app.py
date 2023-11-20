@@ -89,17 +89,13 @@ def get_datetime():
 @app.route("/pin-process", methods=['POST'])
 def pin_process():
     data = request.get_json()
-    pin_ingresado = data['pin']
-    print("PIN ingresado:", pin_ingresado)
-    
-    mef.update(entry_x = 1 if pin_ingresado == str(mef.sesion.pin) else 0)
+    mef.update(entry_x = 1 if data['pin'] == str(mef.sesion.pin) else 0)
     return jsonify(result = mef.getCurrentView())
 
 @app.route("/menu/select_option", methods=['POST'])
 def menu_select_option():
     data = request.get_json()
-    option = data['option_number']
-    mef.update(entry_x = int(option))
+    mef.update(entry_x = data['option_number'])
     return jsonify(result = mef.getCurrentView())
 
 @app.route("/api/diff", methods=['POST'])
@@ -111,30 +107,20 @@ def api_diff():
 
 @app.route("/api/monto")
 def api_get_monto():
-
-    # Esperar respuesta del backend
-    while mef.montoCuenta == -1:
-        pass
-
-    # En caso de error, backend responde "-2"
-    if (mef.montoCuenta == -2):
-        return jsonify(success=0, msg="No se pudo completar la operación")
-    else:
-        return jsonify(success=1, value=mef.montoCuenta)
+    mef.update(entry_x=2)
+    return jsonify(success=mef.success, msg=mef.message)
 
 # ---- MQTT Callbacks ---------------------------------------------
     
 def onReceiveMqttMessage(mosq, obj, msg):
     print("Mensaje MQTT recibido", msg.topic, msg.payload)
 
-    #if msg.topic == Constantes.MIN_TOPIC:
-    #    mef.limites.extraccion_min = Utils.try_parseInt(msg.payload)
-    #    print("Se actualizó el mínimo de extracción: $", mef.limites.extraccion_min)
-    #elif msg.topic == Constantes.MAX_TOPIC:
-    #    mef.limites.extraccion_max = Utils.try_parseInt(msg.payload)
-    #    print("Se actualizó el máximo de extracción: $", mef.limites.extraccion_max)
-    #    mef.limites.guardar()
-    if msg.topic == Constantes.PIN_RESPONSE_TOPIC:
+    if msg.topic == Constantes.MIN_TOPIC:
+        mef.limites.extraccion_min = Utils.try_parseInt(msg.payload)
+    elif msg.topic == Constantes.MAX_TOPIC:
+        mef.limites.extraccion_max = Utils.try_parseInt(msg.payload)
+        mef.limites.guardar()
+    elif msg.topic == Constantes.PIN_RESPONSE_TOPIC:
         mef.sesion.pin = Utils.try_parseInt(msg.payload)
         mef.sesion.pin_respondido = True
     elif msg.topic == Constantes.MONTO_RESPONSE_TOPIC:
