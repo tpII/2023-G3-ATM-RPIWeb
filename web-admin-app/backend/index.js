@@ -89,6 +89,8 @@ function mqttConfig() {
   const INGRESO_RESPONSE_TOPIC = "cajero/ingreso_response"
   const RETIRO_REQUEST_TOPIC = "cajero/retiro_request"
   const RETIRO_RESPONSE_TOPIC = "cajero/retiro_response"
+  const CBU_REQUEST_TOPIC = "cajero/cbu_request"
+  const CBU_RESPONSE_TOPIC = "cajero/cbu_response"
 
   mqttClient.on("connect", () => {
     console.log("Conectado correctamente al broker MQTT");
@@ -98,6 +100,7 @@ function mqttConfig() {
     mqttClient.subscribe(MONTO_REQUEST_TOPIC)
     mqttClient.subscribe(INGRESO_REQUEST_TOPIC)
     mqttClient.subscribe(RETIRO_REQUEST_TOPIC)
+    mqttClient.subscribe(CBU_REQUEST_TOPIC)
   });
 
   // Al recibir publicación
@@ -132,6 +135,14 @@ function mqttConfig() {
       axios.post(`http://${MQTT_BROKER_IP}:${BACKEND_PORT}/api/cuentas/retiro`, {tarjetaNro: partes[0], monto: partes[1]})
         .then(res => mqttClient.publish(RETIRO_RESPONSE_TOPIC, res.data.monto.toString()))
         .catch(err => mqttClient.publish(RETIRO_RESPONSE_TOPIC, "-2"))
+    } else if (topic === CBU_REQUEST_TOPIC){
+      const cbu = message.toString()
+      axios.get(`http://${MQTT_BROKER_IP}:${BACKEND_PORT}/api/moves/cbu-info/${cbu}`)
+        .then(res => mqttClient.publish(CBU_RESPONSE_TOPIC, res.data))
+        .catch(err => {
+          console.log(err)
+          mqttClient.publish(CBU_RESPONSE_TOPIC, "-2")
+        })
     }
   });
 

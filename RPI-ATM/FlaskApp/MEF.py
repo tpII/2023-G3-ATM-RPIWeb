@@ -4,7 +4,7 @@ import Constantes
 
 # Constantes
 STATE_PAGES = ["menu", "waiting-card", "pin-ack", "pin-input", 
-               "option-saldo", "option-ingreso", "option-retiro", 
+               "option-saldo", "option-ingreso", "option-retiro", "option-transaccion",
                "error"]
 
 class Sesion():
@@ -28,6 +28,7 @@ class MEF():
         self.efectivo = 2000
         self.montoCuenta = -1
         self.montoDiff = -1
+        self.cbu = -1
         self.message = ""
 
     def start(self, lectorRfid, clienteMqtt):
@@ -46,6 +47,7 @@ class MEF():
         self.times_in_state = 0
         self.montoCuenta = -1
         self.montoDiff = -1
+        self.message = ""
 
     def getCurrentView(self) -> str:
         return STATE_PAGES[self.current_state.value]
@@ -91,6 +93,8 @@ class MEF():
             elif entry_x == 3:
                 self.changeToState(Estados.RETIRO_DINERO)
             elif entry_x == 4:
+                self.changeToState(Estados.TRANSACCION)
+            elif entry_x == 5:
                 self.changeToState(Estados.ESPERANDO_TARJETA)
 
         elif (self.current_state == Estados.MUESTRA_SALDO):
@@ -160,6 +164,21 @@ class MEF():
                         self.message = self.montoCuenta
                         self.efectivo = self.efectivo - self.montoDiff
                         self.clienteMqtt.publish(Constantes.CASH_TOPIC, str(self.efectivo), retain=True)
+
+        elif (self.current_state == Estados.TRANSACCION):
+            if entry_x == 2:
+                self.clienteMqtt.publish(Constantes.CBU_REQUEST_TOPIC, str(self.cbu))
+
+                # Esperar respuesta del backend
+                while self.message == "":
+                    pass
+
+                # En caso de error, backend responde "-2"
+                if (self.message == "-2"):
+                    self.success = 0
+                    self.message = "El CBU no corresponde a un cliente en el sistema"
+                else:
+                    self.success = 1
 
         elif (self.current_state == Estados.ERROR):
             if entry_x == 1:

@@ -80,6 +80,10 @@ def opcion_ingreso():
 def opcion_retiro():
     return render_template("op_retiro.html")
 
+@app.route("/option-transaccion")
+def opcion_transaccion():
+    return render_template("op_transaccion.html")
+
 @app.route("/forward")
 def forward():
     mef.update(entry_x=1)
@@ -116,6 +120,14 @@ def api_diff():
     mef.update(entry_x=2)
     return jsonify(success=mef.success, msg=mef.message)
 
+@app.route("/api/consultar-cbu", methods=['POST'])
+def api_consultar_cbu():
+    data = request.get_json()
+    mef.cbu = data['cbu']
+    mef.update(entry_x=2)
+    print(mef.success, mef.message)
+    return jsonify(success=mef.success, msg=mef.message)
+
 @app.route("/api/monto")
 def api_get_monto():
     mef.update(entry_x=2)
@@ -140,6 +152,8 @@ def onReceiveMqttMessage(mosq, obj, msg):
         mef.montoCuenta = Utils.try_parseInt(msg.payload)
     elif msg.topic == Constantes.RETIRO_RESPONSE_TOPIC:
         mef.montoCuenta = Utils.try_parseInt(msg.payload)
+    elif msg.topic == Constantes.CBU_RESPONSE_TOPIC:
+        mef.message = msg.payload.decode("utf-8")
 
 # ---- TAREAS DE SEGUNDO PLANO -------------------
 
@@ -156,6 +170,7 @@ def backgroundLoop():
     cliente.subscribe(Constantes.MONTO_RESPONSE_TOPIC)
     cliente.subscribe(Constantes.INGRESO_RESPONSE_TOPIC)
     cliente.subscribe(Constantes.RETIRO_RESPONSE_TOPIC)
+    cliente.subscribe(Constantes.CBU_RESPONSE_TOPIC)
 
     # Asignar callbacks
     cliente.on_message = onReceiveMqttMessage

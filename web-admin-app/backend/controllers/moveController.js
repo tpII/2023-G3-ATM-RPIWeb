@@ -1,5 +1,6 @@
 // Importar modelo
 const model = require('../models/move');
+const cuentaModel = require('../models/cuenta')
 
 // Definir controlador (funciones disponibles)
 const controller = {
@@ -39,6 +40,16 @@ const controller = {
 
         const result = await doc.deleteOne()
         return result ? res.json(result) : res.status(400).json({message: "Error al borrar"}) 
+    },
+
+    getCbuInfo: async(req, res) => {
+        const cbuTarget = req.params.cbu
+        if (!cbuTarget) return res.status(400).json({message: "CBU no especificado"})
+
+        const cuenta = await cuentaModel.findOne({cbu: cbuTarget}).populate(['cliente'])
+        if (!cuenta) return res.status(400).json({message: "No existe cuenta asociada a dicho CBU"})
+
+        return res.json(cuenta.cliente.nombre)
     }
 }
 
