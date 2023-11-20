@@ -16,7 +16,7 @@ function post(){
         body: JSON.stringify({monto: monto.toString()}),
         headers: {"Content-type": "application/json; charset=UTF-8"}
     }).then(res => res.json().then(data => {
-        if (data.success === "0") titleText.innerText = data.msg
+        if (data.success == 0) titleText.innerText = data.msg
         else {
             titleText.innerText = "Operación exitosa. Su nuevo saldo es"
             valueText.innerText = "$" + data.value.toFixed(2)

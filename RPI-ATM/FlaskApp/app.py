@@ -118,6 +118,22 @@ def api_depositar():
     else:
         return jsonify(success=1, value=mef.montoCuenta)
 
+@app.route("/api/retirar", methods=['POST'])
+def api_retirar():
+    data = request.get_json()
+    monto = data['monto']
+    mef.clienteMqtt.publish(Constantes.RETIRO_REQUEST_TOPIC, str(mef.sesion.id) + "-" + monto)
+
+    # Esperar respuesta del backend
+    while mef.montoCuenta == -1:
+        pass
+
+    # En caso de error, backend responde "-2"
+    if (mef.montoCuenta == -2):
+        return jsonify(success=0, msg="Extracción mayor al saldo en cuenta. Operación no realizada")
+    else:
+        return jsonify(success=1, value=mef.montoCuenta)
+
 @app.route("/api/monto")
 def api_get_monto():
 
@@ -134,6 +150,8 @@ def api_get_monto():
 # ---- MQTT Callbacks ---------------------------------------------
     
 def onReceiveMqttMessage(mosq, obj, msg):
+    print("Mensaje MQTT recibido", msg.topic, msg.payload)
+
     #if msg.topic == Constantes.MIN_TOPIC:
     #    mef.limites.extraccion_min = Utils.try_parseInt(msg.payload)
     #    print("Se actualizó el mínimo de extracción: $", mef.limites.extraccion_min)
