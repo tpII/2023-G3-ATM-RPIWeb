@@ -1,6 +1,8 @@
 from flask import Flask, render_template, jsonify, redirect, request
 from datetime import datetime           # Hora actual
 from time import sleep
+
+import signal
 import threading
 import random
 import sys                              # Argumentos por consola
@@ -21,6 +23,15 @@ HOSTNAME = sys.argv[1]              # DE LA COMPUTADORA, NO LA RASPBERRY
 
 app = Flask(__name__)
 mef = MEF()
+
+# Detección de CTRL+C
+def handle_signal(signum, frame):
+    print("Cerrando cajero")
+    mef.stop()
+    GPIO.cleanup()
+    exit(0)
+
+signal.signal(signal.SIGINT, handle_signal)
 
 # ---- VISTAS --------------------------------------
 

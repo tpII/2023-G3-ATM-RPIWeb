@@ -37,6 +37,10 @@ class MEF():
         self.clienteMqtt.publish(Constantes.CASH_TOPIC, str(self.efectivo), retain=True)
         self.limites.cargar()
 
+    def stop(self):
+        self.clienteMqtt.publish(Constantes.STATUS_TOPIC, "0", retain=True)
+        self.limites.guardar()
+
     def changeToState(self, newState):
         self.current_state = newState
         self.times_in_state = 0
