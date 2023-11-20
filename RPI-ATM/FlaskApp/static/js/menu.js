@@ -41,3 +41,12 @@ async function update_datetime(){
 // main program
 update_datetime()
 setInterval(update_datetime, 30000)
+
+// keyboard listener
+document.addEventListener("keydown", event => {
+    const name = event.key
+
+    if (name.length == 1 && name.charAt(0) >= '0' && name.charAt(0) <= '4'){
+        select_option(parseInt(name))
+    }
+})
