@@ -2,7 +2,9 @@ from Estados import Estados
 import Constantes
 
 # Constantes
-STATE_PAGES = ["menu", "waiting-card", "pin-ack", "pin-input", "option-saldo", "error"]
+STATE_PAGES = ["menu", "waiting-card", "pin-ack", "pin-input", 
+               "option-saldo", "option-ingreso", "option-retiro", 
+               "error"]
 
 class Sesion():
 
@@ -34,6 +36,7 @@ class MEF():
     def changeToState(self, newState):
         self.current_state = newState
         self.times_in_state = 0
+        self.montoCuenta = -1
 
     def getCurrentView(self) -> str:
         return STATE_PAGES[self.current_state.value]
@@ -75,10 +78,22 @@ class MEF():
             if entry_x == 1:
                 self.clienteMqtt.publish(Constantes.MONTO_REQUEST_TOPIC, self.sesion.id)
                 self.changeToState(Estados.MUESTRA_SALDO)
-            if entry_x == 4:
+            elif entry_x == 2:
+                self.changeToState(Estados.INGRESO_DINERO)
+            elif entry_x == 3:
+                self.changeToState(Estados.RETIRO_DINERO)
+            elif entry_x == 4:
                 self.changeToState(Estados.ESPERANDO_TARJETA)
 
         elif (self.current_state == Estados.MUESTRA_SALDO):
+            if entry_x == 1:
+                self.changeToState(Estados.MENU)
+
+        elif (self.current_state == Estados.INGRESO_DINERO):
+            if entry_x == 1:
+                self.changeToState(Estados.MENU)
+
+        elif (self.current_state == Estados.RETIRO_DINERO):
             if entry_x == 1:
                 self.changeToState(Estados.MENU)
 

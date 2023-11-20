@@ -8,9 +8,8 @@
     <title>Cajero RPI</title>
 </head>
 <body>
-    <h1 id="hint">{{ message }}</h1>
-    <h1 id="pin">- - - -</h1>
-    <script type="module" src="{{ url_for('static', filename='js/utils.js') }}"></script>
-    <script type="module" src="{{ url_for('static', filename='js/pin_input.js') }}"></script>
+    <h1 id="title">Su saldo actual</h1>
+    <h1 id="value">$-.--</h1>
+    <script src="{{ url_for('static', filename='js/op_consulta.js') }}"></script>
 </body>
 </html>

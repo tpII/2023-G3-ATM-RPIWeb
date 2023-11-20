@@ -1,7 +1,8 @@
-const target = 1234
+import { isKeyDigit } from './utils.js'
+
+// variables
 let current_pin = Array(4).fill(-1)
 let current_index = 0
-let attempts_left = 3
 
 // HTML elements
 let pin_text = document.getElementById("pin")
@@ -13,7 +14,7 @@ document.addEventListener('keydown', (event) => {
     console.log(name)
     
     // detect if it's a number
-    if (name.length == 1 && name.charAt(0) >= '0' && name.charAt(0) <= '9'){
+    if (name.length == 1 && isKeyDigit(name)){
         if (current_index == 4) return
         current_pin[current_index++] = name.charAt(0)
         showPin()

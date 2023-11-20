@@ -58,8 +58,16 @@ def menu():
         return redirect('/')
     
 @app.route("/option-saldo")
-def consulta_saldo():
-    return render_template("consulta_saldo.html")
+def opcion_consulta():
+    return render_template("op_consulta.html")
+
+@app.route("/option-ingreso")
+def opcion_ingreso():
+    return render_template("op_ingreso.html")
+
+@app.route("/option-retiro")
+def opcion_retiro():
+    return render_template("op_retiro.html")
 
 @app.route("/forward")
 def forward():
@@ -93,6 +101,22 @@ def menu_select_option():
     option = data['option_number']
     mef.update(entry_x = int(option))
     return jsonify(result = mef.getCurrentView())
+
+@app.route("/api/depositar", methods=['POST'])
+def api_depositar():
+    data = request.get_json()
+    monto = data['monto']
+    mef.clienteMqtt.publish(Constantes.INGRESO_REQUEST_TOPIC, str(mef.sesion.id) + "-" + monto)
+
+    # Esperar respuesta del backend
+    while mef.montoCuenta == -1:
+        pass
+
+    # En caso de error, backend responde "-2"
+    if (mef.montoCuenta == -2):
+        return jsonify(success=0, msg="Operación no realizada. Devolviendo el dinero ingresado...")
+    else:
+        return jsonify(success=1, value=mef.montoCuenta)
 
 @app.route("/api/monto")
 def api_get_monto():

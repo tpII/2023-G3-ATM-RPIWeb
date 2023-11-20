@@ -8,8 +8,9 @@
     <title>Cajero RPI</title>
 </head>
 <body>
-    <h1 id="title">Su saldo actual</h1>
-    <h1 id="value">$-.--</h1>
-    <script src="{{ url_for('static', filename='js/consulta_saldo.js') }}"></script>
+    <h1 id="title">Indique el monto a ingresar</h1>
+    <h1 id="value">$0.00</h1>
+    <script type="module" src="{{ url_for('static', filename='js/utils.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/op_ingreso.js') }}"></script>
 </body>
 </html>

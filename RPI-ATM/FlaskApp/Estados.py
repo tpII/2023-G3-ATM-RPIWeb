@@ -6,4 +6,7 @@ class Estados(Enum):
     CONOCIENDO_PIN = 2
     INGRESO_PIN = 3
     MUESTRA_SALDO = 4
-    ERROR = 5
+    INGRESO_DINERO = 5
+    RETIRO_DINERO = 6
+    ERROR = 7
+    
