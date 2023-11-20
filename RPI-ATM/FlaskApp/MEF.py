@@ -25,6 +25,7 @@ class MEF():
         self.attempts = 0
         self.efectivo = 2000
         self.montoCuenta = -1
+        self.montoDiff = -1
         self.message = ""
 
     def start(self, lectorRfid, clienteMqtt):
@@ -37,6 +38,7 @@ class MEF():
         self.current_state = newState
         self.times_in_state = 0
         self.montoCuenta = -1
+        self.montoDiff = -1
 
     def getCurrentView(self) -> str:
         return STATE_PAGES[self.current_state.value]
@@ -92,10 +94,42 @@ class MEF():
         elif (self.current_state == Estados.INGRESO_DINERO):
             if entry_x == 1:
                 self.changeToState(Estados.MENU)
+            elif entry_x == 2:
+                self.clienteMqtt.publish(Constantes.INGRESO_REQUEST_TOPIC, str(self.sesion.id) + "-" + str(self.montoDiff))
+
+                # Esperar respuesta del backend
+                while self.montoCuenta == -1:
+                    pass
+
+                # En caso de error, backend responde "-2"
+                if (self.montoCuenta == -2):
+                    self.success = 0
+                    self.message = "Operación no realizada. Devolviendo el dinero ingresado..."
+                else:
+                    self.success = 1
+                    self.message = self.montoCuenta
+                    self.efectivo = self.efectivo + self.montoDiff
+                    self.clienteMqtt.publish(Constantes.CASH_TOPIC, str(self.efectivo), retain=True)
 
         elif (self.current_state == Estados.RETIRO_DINERO):
             if entry_x == 1:
                 self.changeToState(Estados.MENU)
+            elif entry_x == 2:
+                self.clienteMqtt.publish(Constantes.RETIRO_REQUEST_TOPIC, str(self.sesion.id) + "-" + str(self.montoDiff))
+
+                # Esperar respuesta del backend
+                while self.montoCuenta == -1:
+                    pass
+
+                # En caso de error, backend responde "-2"
+                if (self.montoCuenta == -2):
+                    self.success = 0
+                    self.message = "Extracción mayor al saldo en cuenta. Operación no realizada"
+                else:
+                    self.success = 1
+                    self.message = self.montoCuenta
+                    self.efectivo = self.efectivo - self.montoDiff
+                    self.clienteMqtt.publish(Constantes.CASH_TOPIC, str(self.efectivo), retain=True)
 
         elif (self.current_state == Estados.ERROR):
             if entry_x == 1:

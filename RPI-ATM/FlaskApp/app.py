@@ -102,37 +102,12 @@ def menu_select_option():
     mef.update(entry_x = int(option))
     return jsonify(result = mef.getCurrentView())
 
-@app.route("/api/depositar", methods=['POST'])
-def api_depositar():
+@app.route("/api/diff", methods=['POST'])
+def api_diff():
     data = request.get_json()
-    monto = data['monto']
-    mef.clienteMqtt.publish(Constantes.INGRESO_REQUEST_TOPIC, str(mef.sesion.id) + "-" + monto)
-
-    # Esperar respuesta del backend
-    while mef.montoCuenta == -1:
-        pass
-
-    # En caso de error, backend responde "-2"
-    if (mef.montoCuenta == -2):
-        return jsonify(success=0, msg="Operación no realizada. Devolviendo el dinero ingresado...")
-    else:
-        return jsonify(success=1, value=mef.montoCuenta)
-
-@app.route("/api/retirar", methods=['POST'])
-def api_retirar():
-    data = request.get_json()
-    monto = data['monto']
-    mef.clienteMqtt.publish(Constantes.RETIRO_REQUEST_TOPIC, str(mef.sesion.id) + "-" + monto)
-
-    # Esperar respuesta del backend
-    while mef.montoCuenta == -1:
-        pass
-
-    # En caso de error, backend responde "-2"
-    if (mef.montoCuenta == -2):
-        return jsonify(success=0, msg="Extracción mayor al saldo en cuenta. Operación no realizada")
-    else:
-        return jsonify(success=1, value=mef.montoCuenta)
+    mef.montoDiff = data['monto']
+    mef.update(entry_x=2)
+    return jsonify(success=mef.success, msg=mef.message)
 
 @app.route("/api/monto")
 def api_get_monto():
