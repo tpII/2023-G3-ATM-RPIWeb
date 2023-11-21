@@ -13,16 +13,16 @@ import paho.mqtt.client as mqtt         # MQTT Python
 import RPi.GPIO as GPIO                 # Pines RPI
 
 # Clases propias
+from comunicacion import Suscriptor
 from Estados import Estados
 from MEF import MEF
-import Constantes
-import Utils
 
 # Constantes
 HOSTNAME = sys.argv[1]              # DE LA COMPUTADORA, NO LA RASPBERRY
 
 app = Flask(__name__)
 mef = MEF()
+suscriptor = Suscriptor(mef)
 
 # Detección de CTRL+C
 def handle_signal(signum, frame):
@@ -136,24 +136,7 @@ def api_get_monto():
 # ---- MQTT Callbacks ---------------------------------------------
     
 def onReceiveMqttMessage(mosq, obj, msg):
-    print("Mensaje MQTT recibido", msg.topic, msg.payload)
-
-    if msg.topic == Constantes.MIN_TOPIC:
-        mef.limites.extraccion_min = Utils.try_parseInt(msg.payload)
-    elif msg.topic == Constantes.MAX_TOPIC:
-        mef.limites.extraccion_max = Utils.try_parseInt(msg.payload)
-        mef.limites.guardar()
-    elif msg.topic == Constantes.PIN_RESPONSE_TOPIC:
-        mef.sesion.pin = Utils.try_parseInt(msg.payload)
-        mef.sesion.pin_respondido = True
-    elif msg.topic == Constantes.MONTO_RESPONSE_TOPIC:
-        mef.montoCuenta = Utils.try_parseInt(msg.payload)
-    elif msg.topic == Constantes.INGRESO_RESPONSE_TOPIC:
-        mef.montoCuenta = Utils.try_parseInt(msg.payload)
-    elif msg.topic == Constantes.RETIRO_RESPONSE_TOPIC:
-        mef.montoCuenta = Utils.try_parseInt(msg.payload)
-    elif msg.topic == Constantes.CBU_RESPONSE_TOPIC:
-        mef.message = msg.payload.decode("utf-8")
+    suscriptor.procesar(msg.topic, msg.payload)
 
 # ---- TAREAS DE SEGUNDO PLANO -------------------
 
@@ -164,13 +147,7 @@ def backgroundLoop():
     # Conexión MQTT
     cliente = mqtt.Client(f'cajero-{random.randint(0, 100)}')
     cliente.connect(HOSTNAME)
-    cliente.subscribe(Constantes.MAX_TOPIC)
-    cliente.subscribe(Constantes.MIN_TOPIC)
-    cliente.subscribe(Constantes.PIN_RESPONSE_TOPIC)
-    cliente.subscribe(Constantes.MONTO_RESPONSE_TOPIC)
-    cliente.subscribe(Constantes.INGRESO_RESPONSE_TOPIC)
-    cliente.subscribe(Constantes.RETIRO_RESPONSE_TOPIC)
-    cliente.subscribe(Constantes.CBU_RESPONSE_TOPIC)
+    suscriptor.suscribir_topicos(cliente)
 
     # Asignar callbacks
     cliente.on_message = onReceiveMqttMessage
