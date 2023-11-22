@@ -1,6 +1,7 @@
 // Importar modelo
 const model = require('../models/move');
 const cuentaModel = require('../models/cuenta')
+const cardModel = require('../models/card')
 
 // Definir controlador (funciones disponibles)
 const controller = {
@@ -50,6 +51,38 @@ const controller = {
         if (!cuenta) return res.status(400).json({message: "No existe cuenta asociada a dicho CBU"})
 
         return res.json(cuenta.cliente.nombre)
+    },
+
+    transferir: async(req, res) => {
+        const {tarjetaNro, cbuDestino, monto} = req.body
+        console.log(tarjetaNro, cbuDestino, monto)
+        
+        if (!tarjetaNro || !cbuDestino || !monto) 
+            return res.status(400).json({message: "Parametros no especificados"})
+
+        const cuentaDestino = await cuentaModel.findOne({cbu: cbuDestino})
+        const tarjetaOrigen = await cardModel.findOne({nro: tarjetaNro})
+        const cuentaOrigen = await cuentaModel.findOne({tarjeta: tarjetaOrigen._id})
+
+        // Verificar si las cuentas coinciden
+        if (cuentaOrigen.cbu.toString() == cbuDestino){
+            return res.status(400).json({message: "CBU destino es igual a origen"})
+        }
+
+        // Verificar si no excede saldo actual en origen
+        if (cuentaOrigen.monto < monto){
+            return res.status(400).json({message: "Saldo insuficiente en cuenta"})
+        }
+
+        // Actualizar cuentas
+        cuentaDestino.monto = parseInt(cuentaDestino.monto) + parseInt(monto)
+        cuentaOrigen.monto -= monto
+
+        const saved1 = await cuentaDestino.save()
+        const saved2 = await cuentaOrigen.save()
+
+        if (saved1 && saved2) return res.json({monto: cuentaOrigen.monto})
+        else res.status(400).json({message: "Error al realizar transferencia"})
     }
 }
 

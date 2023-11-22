@@ -166,7 +166,9 @@ class MEF():
                         self.clienteMqtt.publish(Constantes.CASH_TOPIC, str(self.efectivo), retain=True)
 
         elif (self.current_state == Estados.TRANSACCION):
-            if entry_x == 2:
+            if entry_x == 1:
+                self.changeToState(Estados.MENU)
+            elif entry_x == 2:
                 self.clienteMqtt.publish(Constantes.CBU_REQUEST_TOPIC, str(self.cbu))
 
                 # Esperar respuesta del backend
@@ -179,6 +181,20 @@ class MEF():
                     self.message = "El CBU no corresponde a un cliente en el sistema"
                 else:
                     self.success = 1
+
+            elif entry_x == 3:
+                self.clienteMqtt.publish(Constantes.TRANSFER_REQUEST_TOPIC, str(self.sesion.id) + "-" + str(self.cbu) + "-" + str(self.montoDiff))
+
+                # Eperar respuesta del backend
+                while self.montoCuenta == -1:
+                    pass
+
+                # En caso de error, backend responde "-2"
+                if (self.montoCuenta == -2):
+                    self.success = 0
+                else:
+                    self.success = 1
+                    self.message = self.montoCuenta
 
         elif (self.current_state == Estados.ERROR):
             if entry_x == 1:

@@ -11,6 +11,7 @@ router.post('/add', controller.post)
 router.delete('/delete/:id', controller.delete)
 
 router.get('/cbu-info/:cbu', controller.getCbuInfo)
+router.post('/transferir', controller.transferir)
 
 // Atributo público
 module.exports = router;

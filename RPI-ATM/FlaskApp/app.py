@@ -128,6 +128,14 @@ def api_consultar_cbu():
     print(mef.success, mef.message)
     return jsonify(success=mef.success, msg=mef.message)
 
+@app.route("/api/transferir", methods=['POST'])
+def api_transferir():
+    data = request.get_json()
+    mef.montoDiff = data['monto']
+    mef.update(entry_x=3)
+    print(mef.success, mef.montoCuenta)
+    return jsonify(success=mef.success, msg=mef.montoCuenta)
+
 @app.route("/api/monto")
 def api_get_monto():
     mef.update(entry_x=2)

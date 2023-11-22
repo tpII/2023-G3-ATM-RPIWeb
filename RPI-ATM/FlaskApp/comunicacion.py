@@ -14,6 +14,7 @@ class Suscriptor():
         cliente.subscribe(Constantes.INGRESO_RESPONSE_TOPIC)
         cliente.subscribe(Constantes.RETIRO_RESPONSE_TOPIC)
         cliente.subscribe(Constantes.CBU_RESPONSE_TOPIC)
+        cliente.subscribe(Constantes.TRANSFER_RESPONSE_TOPIC)
 
     def procesar(self, topic, payload):
         if topic == Constantes.MIN_TOPIC:
@@ -32,3 +33,5 @@ class Suscriptor():
             self.mef.montoCuenta = Utils.try_parseInt(payload)
         elif topic == Constantes.CBU_RESPONSE_TOPIC:
             self.mef.message = payload.decode("utf-8")
+        elif topic == Constantes.TRANSFER_RESPONSE_TOPIC:
+            self.mef.montoCuenta = Utils.try_parseInt(payload)

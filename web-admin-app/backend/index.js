@@ -98,6 +98,8 @@ function mqttConfig() {
   const RETIRO_RESPONSE_TOPIC = "cajero/retiro_response"
   const CBU_REQUEST_TOPIC = "cajero/cbu_request"
   const CBU_RESPONSE_TOPIC = "cajero/cbu_response"
+  const TRANSFER_REQUEST_TOPIC = "cajero/transfer_request"
+  const TRANSFER_RESPONSE_TOPIC = "cajero/transfer_response"
 
   mqttClient.on("connect", () => {
     console.log("Conectado correctamente al broker MQTT");
@@ -108,6 +110,7 @@ function mqttConfig() {
     mqttClient.subscribe(INGRESO_REQUEST_TOPIC)
     mqttClient.subscribe(RETIRO_REQUEST_TOPIC)
     mqttClient.subscribe(CBU_REQUEST_TOPIC)
+    mqttClient.subscribe(TRANSFER_REQUEST_TOPIC)
   });
 
   // Al recibir publicación
@@ -156,6 +159,16 @@ function mqttConfig() {
       miApi.get(`moves/cbu-info/${cbu}`)
         .then(res => mqttClient.publish(CBU_RESPONSE_TOPIC, res.data))
         .catch(err =>  mqttClient.publish(CBU_RESPONSE_TOPIC, "-2"))
+    }
+
+    else if (topic === TRANSFER_REQUEST_TOPIC){
+      const partes = message.toString().split("-")
+      miApi.post(`moves/transferir`, {tarjetaNro: partes[0], cbuDestino: partes[1], monto: partes[2]})
+        .then(res => mqttClient.publish(TRANSFER_RESPONSE_TOPIC, res.data.monto.toString()))
+        .catch(err => {
+          console.log(err)
+          mqttClient.publish(TRANSFER_RESPONSE_TOPIC, "-2")
+        })
     }
   });
 }
