@@ -78,10 +78,18 @@ const controller = {
         cuentaDestino.monto = parseInt(cuentaDestino.monto) + parseInt(monto)
         cuentaOrigen.monto -= monto
 
+        // Crear documento en coleccion moves
+        const move = new model({
+            emisorId: cuentaOrigen.cliente,
+            receptorId: cuentaDestino.cliente,
+            monto: monto
+        })
+
         const saved1 = await cuentaDestino.save()
         const saved2 = await cuentaOrigen.save()
+        const saved3 = await move.save()
 
-        if (saved1 && saved2) return res.json({monto: cuentaOrigen.monto})
+        if (saved1 && saved2 && saved3) return res.json({monto: cuentaOrigen.monto})
         else res.status(400).json({message: "Error al realizar transferencia"})
     }
 }
