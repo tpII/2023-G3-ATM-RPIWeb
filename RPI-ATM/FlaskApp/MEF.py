@@ -160,7 +160,7 @@ class MEF():
             if entry_x == 1:
                 self.changeToState(Estados.MENU)
             elif entry_x == 2:
-                self.clienteMqtt.publish(Constantes.CBU_REQUEST_TOPIC, str(self.cbu))
+                self.clienteMqtt.publish(Constantes.CBU_REQUEST_TOPIC, str(self.sesion.card_database_id) + "-" + str(self.cbu))
 
                 # Esperar respuesta del backend
                 while self.message == "":
@@ -174,9 +174,9 @@ class MEF():
                     self.success = 1
 
             elif entry_x == 3:
-                self.clienteMqtt.publish(Constantes.TRANSFER_REQUEST_TOPIC, str(self.sesion.id) + "-" + str(self.cbu) + "-" + str(self.montoDiff))
+                self.clienteMqtt.publish(Constantes.TRANSFER_REQUEST_TOPIC, str(self.sesion.card_database_id) + "-" + str(self.cbu) + "-" + str(self.montoDiff))
 
-                # Eperar respuesta del backend
+                # Esperar respuesta del backend
                 while self.montoCuenta == -1:
                     pass
 

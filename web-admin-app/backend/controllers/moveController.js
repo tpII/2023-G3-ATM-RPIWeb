@@ -32,6 +32,7 @@ const controller = {
         return saved ? res.json(saved) : res.status(400).json({message: "Error al insertar"})
     },
 
+    // Borrado de transferencia a partir de su ID, sin afectar los saldos en cuentas
     delete: async(req, res) => {
         const id = req.params.id
         if (!id) return res.status(400).json({message: "ID no especificado"})
@@ -43,25 +44,26 @@ const controller = {
         return result ? res.json(result) : res.status(400).json({message: "Error al borrar"}) 
     },
 
+    // Transferencia de cierto monto desde un origen (ID de tarjeta) hacia destino (CBU)
     transferir: async(req, res) => {
-        const {tarjetaNro, cbuDestino, monto} = req.body
-        console.log(tarjetaNro, cbuDestino, monto)
-        
-        if (!tarjetaNro || !cbuDestino || !monto) 
-            return res.status(400).json({message: "Parametros no especificados"})
+        const {tarjetaId, cbuDestino, monto} = req.body
 
+        // Comprobación de parámetros presentes
+        if (!tarjetaId || !cbuDestino || !monto){
+            return res.status(400).json({message: "Parametros no especificados"})
+        }
+
+        const cuentaOrigen = await cuentaModel.findOne({tarjeta: tarjetaId})
         const cuentaDestino = await cuentaModel.findOne({cbu: cbuDestino})
-        const tarjetaOrigen = await cardModel.findOne({nro: tarjetaNro})
-        const cuentaOrigen = await cuentaModel.findOne({tarjeta: tarjetaOrigen._id})
 
         // Verificar si las cuentas coinciden
         if (cuentaOrigen.cbu.toString() == cbuDestino){
-            return res.status(400).json({message: "CBU destino es igual a origen"})
+            return res.status(400).json({message: "CBU origen y destino coinciden"})
         }
 
         // Verificar si no excede saldo actual en origen
         if (cuentaOrigen.monto < monto){
-            return res.status(400).json({message: "Saldo insuficiente en cuenta"})
+            return res.status(400).json({message: "Saldo insuficiente en cuenta origen"})
         }
 
         // Actualizar cuentas

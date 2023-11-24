@@ -39,19 +39,25 @@ const controller = {
         return doc ? res.json({monto: doc.monto}) : res.status(400).json({message: "Error al actualizar monto"})
     },
 
+    // Devuelve el próximo CBU disponible para crear una nueva cuenta
     getLastCBU: async(req, res) => {
         const lastCBU = await model.find().sort({ cbu: -1}).limit(1)
         return lastCBU ? res.json({cbu: lastCBU}) : res.json({cbu: 0})
     },
 
+    // A partir de un CBU, devuelve el nombre del cliente asociado
     getCbuInfo: async(req, res) => {
-        const cbuTarget = req.params.cbu
-        if (!cbuTarget) return res.status(400).json({message: "CBU no especificado"})
+        const tarjetaId = req.params.tarjetaId
+        const cbuTarget = req.params.cbuTarget
+        if (!tarjetaId || !cbuTarget) return res.status(400).json({message: "Parámetros no especificados"})
 
-        const cuenta = await model.findOne({cbu: cbuTarget}).populate(['cliente'])
-        if (!cuenta) return res.status(400).json({message: "No existe una cuenta asociada a dicho CBU"})
+        // Encontrar cuenta destino a partir de CBU
+        const cuentaDest = await model.findOne({cbu: cbuTarget}).populate(['cliente'])
+        if (!cuentaDest) return res.status(400).json({message: "No existe una cuenta asociada a dicho CBU"})
 
-        return res.json(cuenta.cliente.nombre)
+        // Verificar que la cuenta origen y destino no sean la misma
+        if (cuentaDest.tarjeta == tarjetaId) return res.status(400).json({message: "El CBU corresponde a tu propia cuenta"})
+        return res.json(cuentaDest.cliente.nombre)
     },
 
 }

@@ -146,7 +146,7 @@ function mqttConfig() {
     // Depósito: se recibe cardID-monto y se devuelve el saldo actualizado de la cuenta
     else if (topic === INGRESO_REQUEST_TOPIC){
       const partes = message.toString().split("-")
-      miApi.post(`cuentas/ingreso`, {tarjetaId: partes[0], monto: partes[1]})
+      miApi.post("cuentas/ingreso", {tarjetaId: partes[0], monto: partes[1]})
         .then(res => mqttClient.publish(INGRESO_RESPONSE_TOPIC, res.data.monto.toString()))
         .catch(err => mqttClient.publish(INGRESO_RESPONSE_TOPIC, "-2"))
     } 
@@ -154,28 +154,26 @@ function mqttConfig() {
     // Retiros: se recibe cardID-monto y se devuelve el saldo actualizado de la cuenta
     else if (topic === RETIRO_REQUEST_TOPIC){
       const partes = message.toString().split("-")
-      miApi.post(`cuentas/retiro`, {tarjetaId: partes[0], monto: partes[1]})
+      miApi.post("cuentas/retiro", {tarjetaId: partes[0], monto: partes[1]})
         .then(res => mqttClient.publish(RETIRO_RESPONSE_TOPIC, res.data.monto.toString()))
         .catch(err => mqttClient.publish(RETIRO_RESPONSE_TOPIC, "-2"))
     } 
     
-    // CBU Info: se recibe un número CBU y se devuelve el nombre del cliente asociado
+    // CBU Info: se recibe CBUdestino-cardIDorigen y se devuelve el nombre del cliente destino
     // En caso de error, se devuelve un mensaje con el prefijo "-"
     else if (topic === CBU_REQUEST_TOPIC){
-      const cbu = message.toString()
-      miApi.get(`cuentas/cbu-info/${cbu}`)
+      const partes = message.toString().split("-")
+      miApi.get(`cuentas/cbu-info/${partes[0]}/${partes[1]}`)
         .then(res => mqttClient.publish(CBU_RESPONSE_TOPIC, res.data))
         .catch(err =>  mqttClient.publish(CBU_RESPONSE_TOPIC, "-" + err.response.data.message))
     }
 
+    // Transferencia: se recibe cardID-CBUdestino-monto y se devuelve el saldo actualizado de origen
     else if (topic === TRANSFER_REQUEST_TOPIC){
       const partes = message.toString().split("-")
-      miApi.post(`moves/transferir`, {tarjetaNro: partes[0], cbuDestino: partes[1], monto: partes[2]})
+      miApi.post("moves/transferir", {tarjetaId: partes[0], cbuDestino: partes[1], monto: partes[2]})
         .then(res => mqttClient.publish(TRANSFER_RESPONSE_TOPIC, res.data.monto.toString()))
-        .catch(err => {
-          console.log(err)
-          mqttClient.publish(TRANSFER_RESPONSE_TOPIC, "-2")
-        })
+        .catch(err => mqttClient.publish(TRANSFER_RESPONSE_TOPIC, "-2"))
     }
   });
 }
