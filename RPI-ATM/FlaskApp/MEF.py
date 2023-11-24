@@ -30,6 +30,7 @@ class MEF():
         self.montoDiff = -1
         self.cbu = -1
         self.message = ""
+        self.message_buffer = ""
 
     def start(self, lectorRfid, clienteMqtt):
         self.lectorRfid = lectorRfid
@@ -67,7 +68,7 @@ class MEF():
             if self.sesion.pin_respondido:
                 if self.sesion.pin == -1:
                     self.changeToState(Estados.ERROR)
-                    self.message = "La tarjeta no está registrada o habilitada en el sistema"
+                    self.message = self.message_buffer
                 else:
                     self.changeToState(Estados.INGRESO_PIN)
             elif self.times_in_state == 5:

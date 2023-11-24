@@ -123,10 +123,12 @@ function mqttConfig() {
       miSocket?.emit("cash", { value: efectivo });
     } 
     
+    // PIN Request: se devuelve el PIN correspondiente al número de tarjeta indicado
+    // En caso de error, se devuelve el caracter "-" seguido del mensaje de error
     else if (topic === REQUEST_PIN_TOPIC) {
       miApi.get(`cards/pin/${message}`)
         .then(res => mqttClient.publish(RESPONSE_PIN_TOPIC, res.data.pin.toString()))
-        .catch(err => mqttClient.publish(RESPONSE_PIN_TOPIC, "-1"))
+        .catch(err => mqttClient.publish(RESPONSE_PIN_TOPIC, "-" + err.response.data.message))
     } 
     
     else if (topic === STATUS_TOPIC){

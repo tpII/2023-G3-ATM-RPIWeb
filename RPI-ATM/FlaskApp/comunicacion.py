@@ -22,9 +22,17 @@ class Suscriptor():
         elif topic == Constantes.MAX_TOPIC:
             self.mef.limites.extraccion_max = Utils.try_parseInt(payload)
             self.mef.limites.guardar()
+        
         elif topic == Constantes.PIN_RESPONSE_TOPIC:
-            self.mef.sesion.pin = Utils.try_parseInt(payload)
+            # payload: PIN (número) o caracter "-" seguido del mensaje de error
+            payload_str = payload.decode("utf-8")
+            if payload_str.startswith("-"):
+                self.mef.message_buffer = payload_str[1:]
+                self.mef.sesion.pin = -1
+            else:
+                self.mef.sesion.pin = Utils.try_parseInt(payload_str)
             self.mef.sesion.pin_respondido = True
+
         elif topic == Constantes.MONTO_RESPONSE_TOPIC:
             self.mef.montoCuenta = Utils.try_parseInt(payload)
         elif topic == Constantes.INGRESO_RESPONSE_TOPIC:
