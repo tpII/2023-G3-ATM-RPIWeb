@@ -125,7 +125,6 @@ def api_consultar_cbu():
     data = request.get_json()
     mef.cbu = data['cbu']
     mef.update(entry_x=2)
-    print(mef.success, mef.message)
     return jsonify(success=mef.success, msg=mef.message)
 
 @app.route("/api/transferir", methods=['POST'])

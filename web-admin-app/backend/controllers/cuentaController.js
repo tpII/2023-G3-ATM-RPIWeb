@@ -42,7 +42,17 @@ const controller = {
     getLastCBU: async(req, res) => {
         const lastCBU = await model.find().sort({ cbu: -1}).limit(1)
         return lastCBU ? res.json({cbu: lastCBU}) : res.json({cbu: 0})
-    }
+    },
+
+    getCbuInfo: async(req, res) => {
+        const cbuTarget = req.params.cbu
+        if (!cbuTarget) return res.status(400).json({message: "CBU no especificado"})
+
+        const cuenta = await model.findOne({cbu: cbuTarget}).populate(['cliente'])
+        if (!cuenta) return res.status(400).json({message: "No existe una cuenta asociada a dicho CBU"})
+
+        return res.json(cuenta.cliente.nombre)
+    },
 
 }
 

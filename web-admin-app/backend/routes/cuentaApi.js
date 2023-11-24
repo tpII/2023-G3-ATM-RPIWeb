@@ -8,5 +8,7 @@ const controller = require('../controllers/cuentaController');
 router.get('/monto/:tarjeta', controller.getMonto)
 router.post('/ingreso', controller.ingresarMonto)
 router.post('/retiro', controller.retirarMonto)
+router.get('/cbu-info/:cbu', controller.getCbuInfo)
+
 // Atributo público
 module.exports = router;

@@ -159,11 +159,13 @@ function mqttConfig() {
         .catch(err => mqttClient.publish(RETIRO_RESPONSE_TOPIC, "-2"))
     } 
     
+    // CBU Info: se recibe un número CBU y se devuelve el nombre del cliente asociado
+    // En caso de error, se devuelve un mensaje con el prefijo "-"
     else if (topic === CBU_REQUEST_TOPIC){
       const cbu = message.toString()
-      miApi.get(`moves/cbu-info/${cbu}`)
+      miApi.get(`cuentas/cbu-info/${cbu}`)
         .then(res => mqttClient.publish(CBU_RESPONSE_TOPIC, res.data))
-        .catch(err =>  mqttClient.publish(CBU_RESPONSE_TOPIC, "-2"))
+        .catch(err =>  mqttClient.publish(CBU_RESPONSE_TOPIC, "-" + err.response.data.message))
     }
 
     else if (topic === TRANSFER_REQUEST_TOPIC){

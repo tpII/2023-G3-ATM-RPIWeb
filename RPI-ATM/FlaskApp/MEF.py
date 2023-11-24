@@ -167,9 +167,9 @@ class MEF():
                     pass
 
                 # En caso de error, backend responde "-2"
-                if (self.message == "-2"):
+                if (self.message.startswith("-")):
                     self.success = 0
-                    self.message = "El CBU no corresponde a un cliente en el sistema"
+                    self.message = self.message[1:]
                 else:
                     self.success = 1
 

@@ -37,8 +37,6 @@ const controller = {
         // También creamos la cuenta asociada
         const lastCBU = await cuentaModel.find({}, "cbu -_id").sort({ cbu: -1}).limit(1)
         const nuevoCBU = lastCBU ? (lastCBU[0].cbu + 1) : 1
-
-        console.log(lastCBU, nuevoCBU)
  
         const nuevaCuenta = new cuentaModel({
             cliente: clienteSeleccionado,

@@ -43,16 +43,6 @@ const controller = {
         return result ? res.json(result) : res.status(400).json({message: "Error al borrar"}) 
     },
 
-    getCbuInfo: async(req, res) => {
-        const cbuTarget = req.params.cbu
-        if (!cbuTarget) return res.status(400).json({message: "CBU no especificado"})
-
-        const cuenta = await cuentaModel.findOne({cbu: cbuTarget}).populate(['cliente'])
-        if (!cuenta) return res.status(400).json({message: "No existe cuenta asociada a dicho CBU"})
-
-        return res.json(cuenta.cliente.nombre)
-    },
-
     transferir: async(req, res) => {
         const {tarjetaNro, cbuDestino, monto} = req.body
         console.log(tarjetaNro, cbuDestino, monto)
