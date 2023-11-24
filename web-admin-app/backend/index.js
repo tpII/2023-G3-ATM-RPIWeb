@@ -143,9 +143,10 @@ function mqttConfig() {
         .catch(err => mqttClient.publish(MONTO_RESPONSE_TOPIC, "-2"))
     } 
     
+    // Depósito: se recibe cardID-monto y se devuelve el saldo actualizado de la cuenta
     else if (topic === INGRESO_REQUEST_TOPIC){
       const partes = message.toString().split("-")
-      miApi.post(`cuentas/ingreso`, {tarjetaNro: partes[0], monto: partes[1]})
+      miApi.post(`cuentas/ingreso`, {tarjetaId: partes[0], monto: partes[1]})
         .then(res => mqttClient.publish(INGRESO_RESPONSE_TOPIC, res.data.monto.toString()))
         .catch(err => mqttClient.publish(INGRESO_RESPONSE_TOPIC, "-2"))
     } 

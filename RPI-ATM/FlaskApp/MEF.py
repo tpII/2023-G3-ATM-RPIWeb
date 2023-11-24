@@ -110,7 +110,7 @@ class MEF():
             if entry_x == 1:
                 self.changeToState(Estados.MENU)
             elif entry_x == 2:
-                self.clienteMqtt.publish(Constantes.INGRESO_REQUEST_TOPIC, str(self.sesion.id) + "-" + str(self.montoDiff))
+                self.clienteMqtt.publish(Constantes.INGRESO_REQUEST_TOPIC, str(self.sesion.card_database_id) + "-" + str(self.montoDiff))
 
                 # Esperar respuesta del backend
                 while self.montoCuenta == -1:

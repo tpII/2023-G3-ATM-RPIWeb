@@ -16,12 +16,10 @@ const controller = {
 
     // Suma el monto especificado a la cuenta asociada a la tarjeta indicada
     ingresarMonto: async(req, res) => {
-        const {tarjetaNro, monto} = req.body
-        if (!tarjetaNro || !monto) return res.status(400).json({message: "Parámetros no especificados"})
+        const {tarjetaId, monto} = req.body
+        if (!tarjetaId || !monto) return res.status(400).json({message: "Parámetros no especificados"})
 
-        // Para reducir el número de consultas, el cajero puede tener el ID de cuenta
-        const tarjeta = await tarjetaModel.findOne({nro: tarjetaNro})
-        const cuenta = await model.findOne({tarjeta: tarjeta._id})
+        const cuenta = await model.findOne({tarjeta: tarjetaId})
         const nuevoMonto = parseInt(cuenta.monto) + parseInt(monto)
 
         const doc = await model.findByIdAndUpdate(cuenta._id, {monto: nuevoMonto}, {new: true})
