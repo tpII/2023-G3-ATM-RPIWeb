@@ -17,7 +17,7 @@ function retirar_dinero(){
     select_option(3)
 }
 
-function realizar_transaccion(){
+function realizar_transferencia(){
     select_option(4)
 }
 

@@ -8,6 +8,6 @@ class Estados(Enum):
     MUESTRA_SALDO = 4
     INGRESO_DINERO = 5
     RETIRO_DINERO = 6
-    TRANSACCION = 7
+    TRANSFERENCIA = 7
     ERROR = 8
     

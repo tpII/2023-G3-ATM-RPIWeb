@@ -80,9 +80,9 @@ def opcion_ingreso():
 def opcion_retiro():
     return render_template("op_retiro.html")
 
-@app.route("/option-transaccion")
-def opcion_transaccion():
-    return render_template("op_transaccion.html")
+@app.route("/option-move")
+def opcion_transferencia():
+    return render_template("op_move.html")
 
 @app.route("/forward")
 def forward():

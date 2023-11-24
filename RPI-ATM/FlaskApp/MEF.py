@@ -4,7 +4,7 @@ import Constantes
 
 # Constantes
 STATE_PAGES = ["menu", "waiting-card", "pin-ack", "pin-input", 
-               "option-saldo", "option-ingreso", "option-retiro", "option-transaccion",
+               "option-saldo", "option-ingreso", "option-retiro", "option-move",
                "error"]
 
 class Sesion():
@@ -93,7 +93,7 @@ class MEF():
             elif entry_x == 3:
                 self.changeToState(Estados.RETIRO_DINERO)
             elif entry_x == 4:
-                self.changeToState(Estados.TRANSACCION)
+                self.changeToState(Estados.TRANSFERENCIA)
             elif entry_x == 5:
                 self.changeToState(Estados.ESPERANDO_TARJETA)
 
@@ -165,7 +165,7 @@ class MEF():
                         self.efectivo = self.efectivo - self.montoDiff
                         self.clienteMqtt.publish(Constantes.CASH_TOPIC, str(self.efectivo), retain=True)
 
-        elif (self.current_state == Estados.TRANSACCION):
+        elif (self.current_state == Estados.TRANSFERENCIA):
             if entry_x == 1:
                 self.changeToState(Estados.MENU)
             elif entry_x == 2:
