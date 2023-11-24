@@ -28,13 +28,12 @@ const controller = {
 
     // Resta el monto especificado a la cuenta asociada a la tarjeta indicada
     retirarMonto: async(req, res) => {
-        const {tarjetaNro, monto} = req.body
-        if (!tarjetaNro || !monto) return res.status(400).json({message: "Parámetros no especificados"})
+        const {tarjetaId, monto} = req.body
+        if (!tarjetaId || !monto) return res.status(400).json({message: "Parámetros no especificados"})
 
-        const tarjeta = await tarjetaModel.findOne({nro: tarjetaNro})
-        const cuenta = await model.findOne({tarjeta: tarjeta._id})
+        const cuenta = await model.findOne({tarjeta: tarjetaId})
         const nuevoMonto = parseInt(cuenta.monto) - parseInt(monto)
-        if (nuevoMonto < 0) return res.status(400).json({message: "Error en retiro saldo mayor al actual"})
+        if (nuevoMonto < 0) return res.status(400).json({message: "El monto a extraer excede al saldo en cuenta"})
 
         const doc = await model.findByIdAndUpdate(cuenta._id, {monto: nuevoMonto}, {new: true})
         return doc ? res.json({monto: doc.monto}) : res.status(400).json({message: "Error al actualizar monto"})

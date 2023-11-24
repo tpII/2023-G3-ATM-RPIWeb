@@ -141,7 +141,7 @@ class MEF():
                     self.message = f"El monto máximo para extraer es ${self.limites.extraccion_max}"
                 else:
                     # Publicacion MQTT
-                    self.clienteMqtt.publish(Constantes.RETIRO_REQUEST_TOPIC, str(self.sesion.id) + "-" + str(self.montoDiff))
+                    self.clienteMqtt.publish(Constantes.RETIRO_REQUEST_TOPIC, str(self.sesion.card_database_id) + "-" + str(self.montoDiff))
 
                     # Esperar respuesta del backend
                     while self.montoCuenta == -1:
