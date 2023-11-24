@@ -70,6 +70,13 @@ app.post("/api/settings/limites", (req, res) => {
   return res.status(200).json({message: "Límites actualizados con éxito"})
 })
 
+// Instancia Axios
+const miApi = axios.create({
+  baseURL: "http://127.0.0.1:2000/api",
+  timeout: 5000,
+  headers: {'Content-Type': 'application/json'}
+})
+
 // Backend listening
 server.listen(BACKEND_PORT, () => {
   console.log(`Servidor en ejecución en el puerto ${BACKEND_PORT}`);
@@ -89,6 +96,10 @@ function mqttConfig() {
   const INGRESO_RESPONSE_TOPIC = "cajero/ingreso_response"
   const RETIRO_REQUEST_TOPIC = "cajero/retiro_request"
   const RETIRO_RESPONSE_TOPIC = "cajero/retiro_response"
+  const CBU_REQUEST_TOPIC = "cajero/cbu_request"
+  const CBU_RESPONSE_TOPIC = "cajero/cbu_response"
+  const TRANSFER_REQUEST_TOPIC = "cajero/transfer_request"
+  const TRANSFER_RESPONSE_TOPIC = "cajero/transfer_response"
 
   mqttClient.on("connect", () => {
     console.log("Conectado correctamente al broker MQTT");
@@ -98,6 +109,8 @@ function mqttConfig() {
     mqttClient.subscribe(MONTO_REQUEST_TOPIC)
     mqttClient.subscribe(INGRESO_REQUEST_TOPIC)
     mqttClient.subscribe(RETIRO_REQUEST_TOPIC)
+    mqttClient.subscribe(CBU_REQUEST_TOPIC)
+    mqttClient.subscribe(TRANSFER_REQUEST_TOPIC)
   });
 
   // Al recibir publicación
@@ -108,33 +121,56 @@ function mqttConfig() {
     if (topic === CASH_TOPIC) {
       efectivo = parseFloat(message);
       miSocket?.emit("cash", { value: efectivo });
-    } else if (topic === REQUEST_PIN_TOPIC) {
-      axios.get(`http://${MQTT_BROKER_IP}:${BACKEND_PORT}/api/cards/pin/${message}`)
+    } 
+    
+    else if (topic === REQUEST_PIN_TOPIC) {
+      miApi.get(`cards/pin/${message}`)
         .then(res => mqttClient.publish(RESPONSE_PIN_TOPIC, res.data.pin.toString()))
         .catch(err => mqttClient.publish(RESPONSE_PIN_TOPIC, "-1"))
-    } else if (topic === STATUS_TOPIC){
+    } 
+    
+    else if (topic === STATUS_TOPIC){
       cajero_activo = message.toString() === "1"
-      if (miSocket) console.log("Emitiendo estado via socket")
       miSocket?.emit('status', {value: cajero_activo})
-    } else if (topic === MONTO_REQUEST_TOPIC){
-      axios.get(`http://${MQTT_BROKER_IP}:${BACKEND_PORT}/api/cuentas/monto/${message}`)
+    } 
+    
+    else if (topic === MONTO_REQUEST_TOPIC){
+      miApi.get(`cuentas/monto/${message}`)
         .then(res => mqttClient.publish(MONTO_RESPONSE_TOPIC, res.data.monto.toString()))
         .catch(err => mqttClient.publish(MONTO_RESPONSE_TOPIC, "-2"))
-    } else if (topic === INGRESO_REQUEST_TOPIC){
+    } 
+    
+    else if (topic === INGRESO_REQUEST_TOPIC){
       const partes = message.toString().split("-")
-
-      axios.post(`http://${MQTT_BROKER_IP}:${BACKEND_PORT}/api/cuentas/ingreso`, {tarjetaNro: partes[0], monto: partes[1]})
+      miApi.post(`cuentas/ingreso`, {tarjetaNro: partes[0], monto: partes[1]})
         .then(res => mqttClient.publish(INGRESO_RESPONSE_TOPIC, res.data.monto.toString()))
         .catch(err => mqttClient.publish(INGRESO_RESPONSE_TOPIC, "-2"))
-    }else if (topic === RETIRO_REQUEST_TOPIC){
+    } 
+    
+    else if (topic === RETIRO_REQUEST_TOPIC){
       const partes = message.toString().split("-")
-
-      axios.post(`http://${MQTT_BROKER_IP}:${BACKEND_PORT}/api/cuentas/retiro`, {tarjetaNro: partes[0], monto: partes[1]})
+      miApi.post(`cuentas/retiro`, {tarjetaNro: partes[0], monto: partes[1]})
         .then(res => mqttClient.publish(RETIRO_RESPONSE_TOPIC, res.data.monto.toString()))
         .catch(err => mqttClient.publish(RETIRO_RESPONSE_TOPIC, "-2"))
+    } 
+    
+    else if (topic === CBU_REQUEST_TOPIC){
+      const cbu = message.toString()
+      miApi.get(`moves/cbu-info/${cbu}`)
+        .then(res => mqttClient.publish(CBU_RESPONSE_TOPIC, res.data))
+        .catch(err =>  mqttClient.publish(CBU_RESPONSE_TOPIC, "-2"))
+    }
+
+    else if (topic === TRANSFER_REQUEST_TOPIC){
+      const partes = message.toString().split("-")
+      miApi.post(`moves/transferir`, {tarjetaNro: partes[0], cbuDestino: partes[1], monto: partes[2]})
+        .then(res => mqttClient.publish(TRANSFER_RESPONSE_TOPIC, res.data.monto.toString()))
+        .catch(err => {
+          console.log(err)
+          mqttClient.publish(TRANSFER_RESPONSE_TOPIC, "-2")
+        })
     }
   });
-
 }
 
 // ---- CONFIGURACIÓN BASE DE DATOS -------------------------------------------

@@ -17,8 +17,12 @@ function retirar_dinero(){
     select_option(3)
 }
 
-function finish_session(){
+function realizar_transferencia(){
     select_option(4)
+}
+
+function finish_session(){
+    select_option(5)
 }
 
 async function select_option(option_number){
@@ -46,7 +50,7 @@ setInterval(update_datetime, 30000)
 document.addEventListener("keydown", event => {
     const name = event.key
 
-    if (name.length == 1 && name.charAt(0) >= '0' && name.charAt(0) <= '4'){
+    if (name.length == 1 && name.charAt(0) >= '0' && name.charAt(0) <= '5'){
         select_option(parseInt(name))
     }
 })

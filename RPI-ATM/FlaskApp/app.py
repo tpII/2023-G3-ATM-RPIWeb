@@ -13,16 +13,16 @@ import paho.mqtt.client as mqtt         # MQTT Python
 import RPi.GPIO as GPIO                 # Pines RPI
 
 # Clases propias
+from comunicacion import Suscriptor
 from Estados import Estados
 from MEF import MEF
-import Constantes
-import Utils
 
 # Constantes
 HOSTNAME = sys.argv[1]              # DE LA COMPUTADORA, NO LA RASPBERRY
 
 app = Flask(__name__)
 mef = MEF()
+suscriptor = Suscriptor(mef)
 
 # Detección de CTRL+C
 def handle_signal(signum, frame):
@@ -80,6 +80,10 @@ def opcion_ingreso():
 def opcion_retiro():
     return render_template("op_retiro.html")
 
+@app.route("/option-move")
+def opcion_transferencia():
+    return render_template("op_move.html")
+
 @app.route("/forward")
 def forward():
     mef.update(entry_x=1)
@@ -116,6 +120,22 @@ def api_diff():
     mef.update(entry_x=2)
     return jsonify(success=mef.success, msg=mef.message)
 
+@app.route("/api/consultar-cbu", methods=['POST'])
+def api_consultar_cbu():
+    data = request.get_json()
+    mef.cbu = data['cbu']
+    mef.update(entry_x=2)
+    print(mef.success, mef.message)
+    return jsonify(success=mef.success, msg=mef.message)
+
+@app.route("/api/transferir", methods=['POST'])
+def api_transferir():
+    data = request.get_json()
+    mef.montoDiff = data['monto']
+    mef.update(entry_x=3)
+    print(mef.success, mef.montoCuenta)
+    return jsonify(success=mef.success, msg=mef.montoCuenta)
+
 @app.route("/api/monto")
 def api_get_monto():
     mef.update(entry_x=2)
@@ -124,22 +144,7 @@ def api_get_monto():
 # ---- MQTT Callbacks ---------------------------------------------
     
 def onReceiveMqttMessage(mosq, obj, msg):
-    print("Mensaje MQTT recibido", msg.topic, msg.payload)
-
-    if msg.topic == Constantes.MIN_TOPIC:
-        mef.limites.extraccion_min = Utils.try_parseInt(msg.payload)
-    elif msg.topic == Constantes.MAX_TOPIC:
-        mef.limites.extraccion_max = Utils.try_parseInt(msg.payload)
-        mef.limites.guardar()
-    elif msg.topic == Constantes.PIN_RESPONSE_TOPIC:
-        mef.sesion.pin = Utils.try_parseInt(msg.payload)
-        mef.sesion.pin_respondido = True
-    elif msg.topic == Constantes.MONTO_RESPONSE_TOPIC:
-        mef.montoCuenta = Utils.try_parseInt(msg.payload)
-    elif msg.topic == Constantes.INGRESO_RESPONSE_TOPIC:
-        mef.montoCuenta = Utils.try_parseInt(msg.payload)
-    elif msg.topic == Constantes.RETIRO_RESPONSE_TOPIC:
-        mef.montoCuenta = Utils.try_parseInt(msg.payload)
+    suscriptor.procesar(msg.topic, msg.payload)
 
 # ---- TAREAS DE SEGUNDO PLANO -------------------
 
@@ -150,12 +155,7 @@ def backgroundLoop():
     # Conexión MQTT
     cliente = mqtt.Client(f'cajero-{random.randint(0, 100)}')
     cliente.connect(HOSTNAME)
-    cliente.subscribe(Constantes.MAX_TOPIC)
-    cliente.subscribe(Constantes.MIN_TOPIC)
-    cliente.subscribe(Constantes.PIN_RESPONSE_TOPIC)
-    cliente.subscribe(Constantes.MONTO_RESPONSE_TOPIC)
-    cliente.subscribe(Constantes.INGRESO_RESPONSE_TOPIC)
-    cliente.subscribe(Constantes.RETIRO_RESPONSE_TOPIC)
+    suscriptor.suscribir_topicos(cliente)
 
     # Asignar callbacks
     cliente.on_message = onReceiveMqttMessage

@@ -3,7 +3,7 @@ const ObjectId = mongoose.Schema.ObjectId
 
 // Definición de esquemas (campos de los documentos)
 const schema = new mongoose.Schema({
-  cliente: ObjectId,
+  cliente: {type: ObjectId, ref: "Cliente"},
   tarjeta: ObjectId,
   tipo: String,
   monto: Number,
