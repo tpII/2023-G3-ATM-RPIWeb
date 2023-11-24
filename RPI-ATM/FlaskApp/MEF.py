@@ -1,21 +1,12 @@
 from Preferencias import LimitesConfig
 from Estados import Estados
+from sesion import Sesion
 import Constantes
 
 # Constantes
 STATE_PAGES = ["menu", "waiting-card", "pin-ack", "pin-input", 
                "option-saldo", "option-ingreso", "option-retiro", "option-move",
                "error"]
-
-class Sesion():
-
-    # Constructor
-    def __init__(self, id, text):
-        self.id = id
-        self.text = text
-        self.pin = -1
-        self.pin_respondido = False
-        self.auth = False
 
 class MEF():
     
@@ -30,7 +21,6 @@ class MEF():
         self.montoDiff = -1
         self.cbu = -1
         self.message = ""
-        self.message_buffer = ""
 
     def start(self, lectorRfid, clienteMqtt):
         self.lectorRfid = lectorRfid
@@ -68,7 +58,7 @@ class MEF():
             if self.sesion.pin_respondido:
                 if self.sesion.pin == -1:
                     self.changeToState(Estados.ERROR)
-                    self.message = self.message_buffer
+                    self.message = self.sesion.error
                 else:
                     self.changeToState(Estados.INGRESO_PIN)
             elif self.times_in_state == 5:
@@ -102,7 +92,7 @@ class MEF():
             if entry_x == 1:
                 self.changeToState(Estados.MENU)
             elif entry_x == 2:
-                self.clienteMqtt.publish(Constantes.MONTO_REQUEST_TOPIC, self.sesion.id)
+                self.clienteMqtt.publish(Constantes.MONTO_REQUEST_TOPIC, self.sesion.card_database_id)
 
                 # Esperar respuesta del backend
                 while self.montoCuenta == -1:

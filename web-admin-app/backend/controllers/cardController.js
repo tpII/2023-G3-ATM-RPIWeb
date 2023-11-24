@@ -52,18 +52,15 @@ const controller = {
         res.json(savedCard);
     },
 
-    // Busca la tarjeta asociada al número pasado por parámetro y devuelve su PIN
+    // Busca la tarjeta asociada al número pasado por parámetro y devuelve el PIN junto al ID
     getPin: async(req, res) => {
         const nro = req.params.nro
         if (!nro) return res.status(400).json({message: "Número no especificado"})
 
-        //const pin = await model.findOne({nro: nro, ban: false}, 'pin -_id')
-        //return pin ? res.json(pin) : res.status(400).json({message: "Tarjeta no registrada"})
-
         const tarjeta = await model.findOne({nro: nro})
         if (!tarjeta) return res.status(400).json({message: "Tarjeta no registrada en el sistema"})
         if (tarjeta.ban) return res.status(400).json({message: "La tarjeta se encuentra bloqueada"})
-        return res.json({pin: tarjeta.pin})
+        return res.json({pin: tarjeta.pin, tarjetaId: tarjeta.id})
     },
 
     // Setea en true el campo "ban" de la tarjeta indicada por id

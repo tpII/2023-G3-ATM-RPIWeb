@@ -123,11 +123,11 @@ function mqttConfig() {
       miSocket?.emit("cash", { value: efectivo });
     } 
     
-    // PIN Request: se devuelve el PIN correspondiente al número de tarjeta indicado
+    // PIN Request: se devuelve "PIN-ID" correspondiente al número de tarjeta indicado
     // En caso de error, se devuelve el caracter "-" seguido del mensaje de error
     else if (topic === REQUEST_PIN_TOPIC) {
       miApi.get(`cards/pin/${message}`)
-        .then(res => mqttClient.publish(RESPONSE_PIN_TOPIC, res.data.pin.toString()))
+        .then(res => mqttClient.publish(RESPONSE_PIN_TOPIC, res.data.pin.toString() + "-" + res.data.tarjetaId.toString()))
         .catch(err => mqttClient.publish(RESPONSE_PIN_TOPIC, "-" + err.response.data.message))
     } 
     
@@ -136,6 +136,7 @@ function mqttConfig() {
       miSocket?.emit('status', {value: cajero_activo})
     } 
     
+    // Consulta de saldo: se devuelve monto en cuenta para el ID de tarjeta indicado
     else if (topic === MONTO_REQUEST_TOPIC){
       miApi.get(`cuentas/monto/${message}`)
         .then(res => mqttClient.publish(MONTO_RESPONSE_TOPIC, res.data.monto.toString()))
