@@ -1,0 +1,51 @@
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: blue;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;              /* 100% of the viewport height */
+    margin: 0;
+}
+
+h1 {
+    color: white;
+    text-align: center;
+}
+
+.top-title {
+    height: 15vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.menu-content {
+    height: 60vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.footer {
+    height: 15vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.button-row {
+    width: 100vh;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+button {
+    width: 40%;
+    height: 50px;
+    margin: 30px;
+    font-size: larger;
+}

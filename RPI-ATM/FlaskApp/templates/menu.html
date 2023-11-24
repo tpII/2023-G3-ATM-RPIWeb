@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/static/favicon.ico">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
+    <title>Cajero RPI</title>
+</head>
+<body>
+    <div class="top-title">
+        <h1>Menú</h1>
+    </div>
+    <div class="menu-content">
+        <div class="button-row">
+            <button onclick="consultar_saldo()">Consultar saldo</button>
+            <button onclick="ingresar_dinero()">Ingresar dinero</button>
+        </div>
+        <div class="button-row">
+            <button onclick="retirar_dinero()">Retirar dinero</button>
+            <button onclick="finish_session()">Terminar</button>
+        </div>
+    </div>
+    <div class="footer">
+        <h1 id="datetime">...</h1>
+    </div>
+    <script src="{{ url_for('static', filename='js/menu.js') }}"></script>
+</body>
+</html>

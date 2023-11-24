@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/static/favicon.ico">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/error.css') }}">
+    <title>Cajero RPI</title>
+</head>
+<body>
+    <h1>{{ message }}</h1>
+    <script src="{{ url_for('static', filename='js/error.js') }}"></script>
+</body>
+</html>
