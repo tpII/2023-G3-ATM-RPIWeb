@@ -1,8 +1,7 @@
 # ---- Constantes -------------------------------------------
 
 CASH_TOPIC = "cajero/efectivo"
-MIN_TOPIC = "cajero/limite_min"
-MAX_TOPIC = "cajero/limite_max"
+LIMITES_TOPIC = "cajero/limites"
 PIN_REQUEST_TOPIC = "cajero/pin_request"
 PIN_RESPONSE_TOPIC = "cajero/pin_response"
 STATUS_TOPIC = "cajero/status"

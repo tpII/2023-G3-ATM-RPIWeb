@@ -7,8 +7,7 @@ class Suscriptor():
         self.mef = mef
 
     def suscribir_topicos(self, cliente):
-        cliente.subscribe(Constantes.MAX_TOPIC)
-        cliente.subscribe(Constantes.MIN_TOPIC)
+        cliente.subscribe(Constantes.LIMITES_TOPIC)
         cliente.subscribe(Constantes.PIN_RESPONSE_TOPIC)
         cliente.subscribe(Constantes.MONTO_RESPONSE_TOPIC)
         cliente.subscribe(Constantes.INGRESO_RESPONSE_TOPIC)
@@ -19,10 +18,10 @@ class Suscriptor():
     def procesar(self, topic, payload):
         print("MQTT", topic, payload)
 
-        if topic == Constantes.MIN_TOPIC:
-            self.mef.limites.extraccion_min = Utils.try_parseInt(payload)
-        elif topic == Constantes.MAX_TOPIC:
-            self.mef.limites.extraccion_max = Utils.try_parseInt(payload)
+        if topic == Constantes.LIMITES_TOPIC:
+            parts = payload.decode("utf-8").split("-")
+            self.mef.limites.extraccion_min = int(parts[0])
+            self.mef.limites.extraccion_max = int(parts[1])
             self.mef.limites.guardar()
         
         elif topic == Constantes.PIN_RESPONSE_TOPIC:

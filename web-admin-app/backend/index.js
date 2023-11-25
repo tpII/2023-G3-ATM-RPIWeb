@@ -26,6 +26,7 @@ const DB_NAME = "atm-db";
 
 // Variables globales
 let cajero_activo = false
+let limites_extraccion = [0.0, 0.0]
 let efectivo = 0.0;
 let mqttClient;
 let miSocket;
@@ -59,14 +60,19 @@ app.use("/api/cuentas", cuentaApi);
 app.use("/api/status", (req, res) => res.json({value: cajero_activo}))
 app.use("/api/cash", (req, res) => res.json({ value: efectivo }))
 
-// Envío de nuevos limites de extracción
+// Carga de límites de extracción
+app.get("/api/settings/limites", (req, res) => res.json({
+  min: limites_extraccion[0],
+  max: limites_extraccion[1]
+}))
+
+// Envío de nuevos límites de extracción
 app.post("/api/settings/limites", (req, res) => {
   const min = req.body.min
   const max = req.body.max
   if (!min || !max) return res.status(400).json({message: "Montos no especificados"})
   if (!mqttClient) return res.status(400).json({message: "Cliente MQTT no inicializado"})
-  mqttClient.publish("cajero/limite_min", min.toString())
-  mqttClient.publish("cajero/limite_max", max.toString())
+  mqttClient.publish("cajero/limites", min.toString() + "-" + max.toString())
   return res.status(200).json({message: "Límites actualizados con éxito"})
 })
 
@@ -100,6 +106,7 @@ function mqttConfig() {
   const CBU_RESPONSE_TOPIC = "cajero/cbu_response"
   const TRANSFER_REQUEST_TOPIC = "cajero/transfer_request"
   const TRANSFER_RESPONSE_TOPIC = "cajero/transfer_response"
+  const LIMITES_TOPIC = "cajero/limites"
 
   mqttClient.on("connect", () => {
     console.log("Conectado correctamente al broker MQTT");
@@ -111,6 +118,7 @@ function mqttConfig() {
     mqttClient.subscribe(RETIRO_REQUEST_TOPIC)
     mqttClient.subscribe(CBU_REQUEST_TOPIC)
     mqttClient.subscribe(TRANSFER_REQUEST_TOPIC)
+    mqttClient.subscribe(LIMITES_TOPIC)
   });
 
   // Al recibir publicación
@@ -174,6 +182,12 @@ function mqttConfig() {
       miApi.post("moves/transferir", {tarjetaId: partes[0], cbuDestino: partes[1], monto: partes[2]})
         .then(res => mqttClient.publish(TRANSFER_RESPONSE_TOPIC, res.data.monto.toString()))
         .catch(err => mqttClient.publish(TRANSFER_RESPONSE_TOPIC, "-2"))
+    }
+
+    // Recepción de límites al iniciar cajero y en actualización exitosa
+    else if (topic === LIMITES_TOPIC){
+      const partes = message.toString().split("-")
+      limites_extraccion = [parseInt(partes[0]), parseInt(partes[1])]
     }
   });
 }

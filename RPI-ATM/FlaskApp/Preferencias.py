@@ -38,4 +38,6 @@ class LimitesConfig():
         except Exception as e:
             print("Error al guardar límites de extracción:", e)
 
-        
+    # Devuelve los límites en formato para publicación MQTT
+    def get_for_publish(self) -> str:
+        return str(self.extraccion_min) + "-" + str(self.extraccion_max)

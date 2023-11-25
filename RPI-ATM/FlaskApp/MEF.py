@@ -25,9 +25,12 @@ class MEF():
     def start(self, lectorRfid, clienteMqtt):
         self.lectorRfid = lectorRfid
         self.clienteMqtt = clienteMqtt
+        self.limites.cargar()
+
+        # Publicar estado, efectivo y límites de extracción cargados
         self.clienteMqtt.publish(Constantes.STATUS_TOPIC, "1", retain=True)
         self.clienteMqtt.publish(Constantes.CASH_TOPIC, str(self.efectivo), retain=True)
-        self.limites.cargar()
+        self.clienteMqtt.publish(Constantes.LIMITES_TOPIC, self.limites.get_for_publish())
 
     def stop(self):
         self.clienteMqtt.publish(Constantes.STATUS_TOPIC, "0", retain=True)
