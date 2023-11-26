@@ -1,4 +1,4 @@
-from Preferencias import LimitesConfig
+from preferencias import LimitesConfig, CashPreference
 from Estados import Estados
 from sesion import Sesion
 import Constantes
@@ -14,9 +14,9 @@ class MEF():
     def __init__(self):
         self.current_state = Estados.ESPERANDO_TARJETA
         self.limites = LimitesConfig()
+        self.efectivo = CashPreference()
         self.times_in_state = 0
         self.attempts = 0
-        self.efectivo = 2000
         self.montoCuenta = -1
         self.montoDiff = -1
         self.cbu = -1
@@ -26,15 +26,17 @@ class MEF():
         self.lectorRfid = lectorRfid
         self.clienteMqtt = clienteMqtt
         self.limites.cargar()
+        self.efectivo.cargar()
 
         # Publicar estado, efectivo y límites de extracción cargados
         self.clienteMqtt.publish(Constantes.STATUS_TOPIC, "1", retain=True)
-        self.clienteMqtt.publish(Constantes.CASH_TOPIC, str(self.efectivo), retain=True)
+        self.clienteMqtt.publish(Constantes.CASH_TOPIC, self.efectivo.get_for_publish(), retain=True)
         self.clienteMqtt.publish(Constantes.LIMITES_TOPIC, self.limites.get_for_publish())
 
     def stop(self):
         self.clienteMqtt.publish(Constantes.STATUS_TOPIC, "0", retain=True)
         self.limites.guardar()
+        self.efectivo.guardar()
 
     def changeToState(self, newState):
         self.current_state = newState
@@ -126,8 +128,8 @@ class MEF():
                 else:
                     self.success = 1
                     self.message = self.montoCuenta
-                    self.efectivo = self.efectivo + self.montoDiff
-                    self.clienteMqtt.publish(Constantes.CASH_TOPIC, str(self.efectivo), retain=True)
+                    self.efectivo.sumar(self.montoDiff)
+                    self.clienteMqtt.publish(Constantes.CASH_TOPIC, self.efectivo.get_for_publish(), retain=True)
 
         elif (self.current_state == Estados.RETIRO_DINERO):
             if entry_x == 1:
@@ -136,7 +138,7 @@ class MEF():
                 self.success = 0
 
                 # Control de limites
-                if (self.montoDiff > self.efectivo):
+                if (self.montoDiff > self.efectivo.valor):
                     self.message = "No hay dinero suficiente en el cajero. Disculpe las molestias"
                 elif (self.montoDiff < self.limites.extraccion_min):
                     self.message = f"El monto mínimo para extraer es ${self.limites.extraccion_min}"
@@ -156,8 +158,8 @@ class MEF():
                     else:
                         self.success = 1
                         self.message = self.montoCuenta
-                        self.efectivo = self.efectivo - self.montoDiff
-                        self.clienteMqtt.publish(Constantes.CASH_TOPIC, str(self.efectivo), retain=True)
+                        self.efectivo.restar(self.montoDiff)
+                        self.clienteMqtt.publish(Constantes.CASH_TOPIC, self.efectivo.get_for_publish(), retain=True)
 
         elif (self.current_state == Estados.TRANSFERENCIA):
             if entry_x == 1:

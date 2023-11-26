@@ -2,6 +2,7 @@
 # del cajero automático, como por ejemplo, los límites de extracción.
 import os.path
 
+# ---- LIMITES DE EXTRACCION -----------------------------    
 class LimitesConfig():
     archivo_limites = "config_limites.txt"
 
@@ -41,3 +42,41 @@ class LimitesConfig():
     # Devuelve los límites en formato para publicación MQTT
     def get_for_publish(self) -> str:
         return str(self.extraccion_min) + "-" + str(self.extraccion_max)
+                
+# ---- EFECTIVO ACTUAL DEL CAJERO ------------------------
+class CashPreference():
+    filename = "config_efectivo.txt"
+
+    def __init__(self):
+        self.valor = 2000
+
+    # Recupera el valor actual. Si el archivo no existe, se genera y se guarda el valor por defecto
+    def cargar(self):
+        if not os.path.isfile(self.filename):
+            self.guardar()
+            return
+
+        try:
+            with open(self.filename, 'r') as file:
+                self.valor = int(file.readline())
+                file.close()
+        except Exception as e:
+            print("Error al cargar efectivo desde txt:", e)
+
+    # Guarda el valor de efectivo en el archivo txt, créandolo si no existe
+    def guardar(self):
+        try:
+            with open(self.filename, 'w') as file:
+                file.write(str(self.valor))
+                file.close()
+        except Exception as e:
+            print("Error al guardar efectivo en txt:", e)
+
+    def sumar(self, diff):
+        self.valor = self.valor + diff
+    
+    def restar(self, diff):
+        self.valor = self.valor - diff
+        
+    def get_for_publish(self) -> str:
+        return str(self.valor)
