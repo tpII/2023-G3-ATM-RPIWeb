@@ -23,12 +23,8 @@ const AccountListPage = () => {
       .catch((err) => setLoading(false));
   }, [])
 
-  return (
-    <main className="main-content">
-      <div className="main-header">
-        <PageHeader color="#ffffcc" icon={icon} name="Cuentas" />
-      </div>
-
+  const printTable = () => {
+    return (
       <div className="table-container">
         <table className="accounts-table">
           <thead>
@@ -58,6 +54,16 @@ const AccountListPage = () => {
           </tbody>
         </table>
       </div>
+    )
+  }
+
+  return (
+    <main className="main-content">
+      <div className="main-header">
+        <PageHeader color="#ffffcc" icon={icon} name="Cuentas" />
+      </div>
+
+      {loading ? <Loading color="yellow" /> : list?.length ? printTable() : <h1>Sin datos</h1> }
     </main>
   )
 }
