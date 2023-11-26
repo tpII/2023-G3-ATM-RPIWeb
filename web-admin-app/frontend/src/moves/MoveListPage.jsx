@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import miApi from "..";
 
 // assets
@@ -8,52 +7,31 @@ import "./styles.css";
 
 // otros componentes
 import PageHeader from "../common/PageHeader";
-import AddButton from "../common/AddButton";
 import Loading from "../common/Loading";
-import DeleteButton from "../common/DeleteButton";
 
-const MoveListPage = (props) => {
+const MoveListPage = () => {
   const [loading, setLoading] = useState(true);
   const [moves, setMoves] = useState([]);
 
-  const getAll = () => {
-    miApi
-      .get("moves/all")
+  useEffect(() => {
+    miApi.get("moves/all")
       .then((res) => {
         setMoves(res.data.movimientos);
         setTimeout(() => setLoading(false), 200);
       })
-      .catch((err) => {
-        console.error("Error: ", err);
-        setLoading(false);
-      });
-  };
-
-  useEffect(() => {
-    getAll();
+      .catch((err) => setLoading(false));
   }, []);
-
-  const borrar = (id) => {
-    miApi
-      .delete(`moves/delete/${id}`)
-      .then((_) => {
-        alert("Transacción eliminada con éxito");
-        getAll();
-      })
-      .catch((err) => alert(err.response?.data?.message));
-  };
 
   const printTable = (data) => {
     return (
       <div className="table-container">
-        <table className="data-table">
+        <table className="moves-table">
           <thead>
             <tr>
               <th>Fecha</th>
               <th>Origen</th>
               <th>Destino</th>
               <th>Monto</th>
-              <th>Opciones</th>
             </tr>
           </thead>
           <tbody>
@@ -63,11 +41,6 @@ const MoveListPage = (props) => {
                 <td>{item.emisorId.nombre}</td>
                 <td>{item.receptorId.nombre}</td>
                 <td>{"$" + item.monto?.toFixed(2)}</td>
-                <td>
-                  <div className="td-options">
-                    <DeleteButton fn={() => borrar(item._id)} />
-                  </div>
-                </td>
               </tr>
             ))}
           </tbody>
@@ -79,11 +52,7 @@ const MoveListPage = (props) => {
   return (
     <main className="main-content">
       <div className="main-header">
-        <PageHeader color="#ccffcc" icon={icon} name="Transacciones" />
-
-        <Link className="add-btn" to="/moves/add">
-          <AddButton darkMode={props.darkMode} />
-        </Link>
+        <PageHeader color="#ccffcc" icon={icon} name="Transferencias" />
       </div>
 
       {loading ? <Loading color="lime" /> : moves?.length ? printTable(moves) : <h1>Sin datos</h1> }
@@ -93,11 +62,6 @@ const MoveListPage = (props) => {
 
 function getDate(id) {
   return new Date(parseInt(id.substring(0,8), 16) * 1000).toString().substring(3,21)
-
-  /*
-  return str.replace("Mon","Lunes").replace("Tue","Martes").replace("Wed","Miércoles")
-    .replace("Thu","Jueves").replace("Fri","Viernes")
-    .replace("Sat","Sábado").replace("Sun", "Domingo") */
 }
 
 export default MoveListPage;

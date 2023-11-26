@@ -1,0 +1,13 @@
+.accounts-table th {
+    background-color: orange;
+}
+
+.accounts-table .style1 {
+    background-color: #ffffbb;
+    color: black
+}
+  
+.accounts-table .style2 {
+    background-color: #ffffee;
+    color: black;
+}

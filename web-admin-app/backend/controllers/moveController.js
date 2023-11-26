@@ -18,34 +18,8 @@ const controller = {
         res.json({movimientos: moves})
     },
 
-    // Inserción
-    post: async(req, res) => {
-        const {emisorId, receptorId, monto} = req.body
-
-        const doc = new model({
-            emisorId: emisorId,
-            receptorId: receptorId,
-            monto: monto
-        })
-
-        const saved = await doc.save()
-        return saved ? res.json(saved) : res.status(400).json({message: "Error al insertar"})
-    },
-
-    // Borrado de transferencia a partir de su ID, sin afectar los saldos en cuentas
-    delete: async(req, res) => {
-        const id = req.params.id
-        if (!id) return res.status(400).json({message: "ID no especificado"})
-
-        const doc = await model.findById(id)
-        if (!doc) return res.status(400).json({message: "ID no encontrado en la base de datos"})
-
-        const result = await doc.deleteOne()
-        return result ? res.json(result) : res.status(400).json({message: "Error al borrar"}) 
-    },
-
-    // Transferencia de cierto monto desde un origen (ID de tarjeta) hacia destino (CBU)
-    transferir: async(req, res) => {
+    // Inserción: transfiere cierto monto desde un origen (ID de tarjeta) hacia destino (CBU)
+    postMove: async(req, res) => {
         const {tarjetaId, cbuDestino, monto} = req.body
 
         // Comprobación de parámetros presentes

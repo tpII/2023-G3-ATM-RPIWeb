@@ -1,9 +1,20 @@
 // Importar modelo
-const model = require('../models/cuenta');
-const tarjetaModel = require('../models/card')
+const model = require('../models/cuenta')
 
 // Definir controlador (funciones disponibles)
 const controller = {
+
+    // Devuelve el número de cuentas registradas
+    getCount: async(req, res) => {
+        c = await model.countDocuments({});
+        res.json({count: c})
+    },
+
+    // Retorna todas las transacciones registradas, con nombres de origen y destino
+    getAll: async(req, res) => {
+        docs = await model.find().populate(['cliente']);
+        res.json({list: docs})
+    },
 
     // Devuelve el monto de la cuenta asociada al ID de tarjeta indicado
     getMonto: async(req, res) => {

@@ -8,6 +8,7 @@ import miApi from "..";
 import face from "./../assets/face.svg";
 import credit_card from "./../assets/credit_card.svg";
 import swap_horiz from "./../assets/swap_horiz.svg";
+import account_balance from "./../assets/account_balance.svg"
 import edit from "./edit.svg";
 import settings from "./settings.svg";
 import "./HomePage.css";
@@ -16,10 +17,11 @@ const socket = io.connect('http://localhost:2000');
 
 function HomePage() {
   const [status, setStatus] = useState(0)
-  const [cash, setCash] = useState(0.00);
-  const [userCount, setUserCount] = useState(0);
-  const [cardCount, setCardCount] = useState(0);
-  const [moveCount, setMoveCount] = useState(0);
+  const [cash, setCash] = useState(0.00)
+  const [userCount, setUserCount] = useState(0)
+  const [cardCount, setCardCount] = useState(0)
+  const [moveCount, setMoveCount] = useState(0)
+  const [accountCount, setAccountCount] = useState(0)
 
   useEffect(() => {
     // Obtener cantidades desde la database
@@ -34,6 +36,10 @@ function HomePage() {
     miApi.get("moves/count")
       .then(res => setMoveCount(res.data.count))
       .catch(err => console.error("No se puede consultar movimientos", err));
+
+    miApi.get("cuentas/count")
+      .then(res => setAccountCount(res.data.count))
+      .catch(err => console.error("No se puede consultar cuentas", err))
 
     // Obtener efectivo desde suscripción mqtt
     miApi.get("cash")
@@ -53,7 +59,7 @@ function HomePage() {
 
   return (
     <main className="home">
-      <h1 id="titulo-cajero">Efectivo en cajero</h1>
+      <h1 id="titulo-cajero">Estado del cajero</h1>
 
       {/* Si el cajero está en servicio, mostrar efectivo */}
       {status ? <div className="cash">
@@ -86,13 +92,23 @@ function HomePage() {
           color="#ffcccc"
           count={cardCount}
         />
+      </div>
 
+      <div className="main-buttons">
         <DashboardCard
           url="/moves"
-          name="Transacciones"
+          name="Transferencias"
           icon={swap_horiz}
           color="#ccffcc"
           count={moveCount}
+        />
+
+        <DashboardCard
+          url="/accounts"
+          name="Cuentas"
+          icon={account_balance}
+          color="#ffffcc"
+          count={accountCount}
         />
       </div>
     </main>

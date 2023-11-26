@@ -1,13 +1,13 @@
-.data-table th {
+.moves-table th {
     background-color: green;
 }
 
-.data-table .style1 {
+.moves-table .style1 {
     background-color: #ddffdd;
     color: black
 }
   
-.data-table .style2 {
+.moves-table .style2 {
     background-color: #eeffee;
     color: black;
 }
