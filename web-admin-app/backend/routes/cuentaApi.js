@@ -5,8 +5,12 @@ const router = express.Router();
 const controller = require('../controllers/cuentaController');
 
 // Definir rutas para las operaciones CRUD
+router.get('/count', controller.getCount)
+router.get('/all', controller.getAll)
 router.get('/monto/:tarjeta', controller.getMonto)
 router.post('/ingreso', controller.ingresarMonto)
 router.post('/retiro', controller.retirarMonto)
+router.get('/cbu-info/:tarjetaId/:cbuTarget', controller.getCbuInfo)
+
 // Atributo público
 module.exports = router;

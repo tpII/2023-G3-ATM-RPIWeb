@@ -5,7 +5,7 @@ const Page404 = () => {
   return (
     <div className='fail-page'>
         <img src={fail} alt='Fallo'/>
-        <span>El clásico 404... esta página no existe o aún no la hicimos :&#41;</span>
+        <span>Esta página no existe, disculpe las molestias</span>
     </div>
   )
 }

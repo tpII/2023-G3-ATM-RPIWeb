@@ -1,21 +1,26 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import miApi from '..'
 
-//assets
+// assets
 import "./SettingsPage.css";
 import { useNavigate } from 'react-router-dom';
 
-//valores por defecto
-const minP = 1000;
-const maxP = 50000;
- 
+
 function Settings() {
-  const [minValue, setMinValue] = useState(minP);
-  const [maxValue, setMaxValue] = useState(maxP);
+  const [minValue, setMinValue] = useState(0.0);
+  const [maxValue, setMaxValue] = useState(0.0);
   const [minError, setMinError] = useState();
   const [maxError, setMaxError] = useState();
   const navigate = useNavigate()
 
+  // Carga de limites actuales al ingresar a la página
+  useEffect(() => {
+    miApi.get('/settings/limites').then(res => {
+      setMinValue(res.data.min)
+      setMaxValue(res.data.max)
+    }).catch(err => alert("No se pueden obtener los límites actuales"))
+  }, [])
+  
   const handleSubmit = (e) => {
     e.preventDefault();
     // Restablecer los mensajes de error

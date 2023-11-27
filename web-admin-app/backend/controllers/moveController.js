@@ -18,60 +18,26 @@ const controller = {
         res.json({movimientos: moves})
     },
 
-    // Inserción
-    post: async(req, res) => {
-        const {emisorId, receptorId, monto} = req.body
+    // Inserción: transfiere cierto monto desde un origen (ID de tarjeta) hacia destino (CBU)
+    postMove: async(req, res) => {
+        const {tarjetaId, cbuDestino, monto} = req.body
 
-        const doc = new model({
-            emisorId: emisorId,
-            receptorId: receptorId,
-            monto: monto
-        })
-
-        const saved = await doc.save()
-        return saved ? res.json(saved) : res.status(400).json({message: "Error al insertar"})
-    },
-
-    delete: async(req, res) => {
-        const id = req.params.id
-        if (!id) return res.status(400).json({message: "ID no especificado"})
-
-        const doc = await model.findById(id)
-        if (!doc) return res.status(400).json({message: "ID no encontrado en la base de datos"})
-
-        const result = await doc.deleteOne()
-        return result ? res.json(result) : res.status(400).json({message: "Error al borrar"}) 
-    },
-
-    getCbuInfo: async(req, res) => {
-        const cbuTarget = req.params.cbu
-        if (!cbuTarget) return res.status(400).json({message: "CBU no especificado"})
-
-        const cuenta = await cuentaModel.findOne({cbu: cbuTarget}).populate(['cliente'])
-        if (!cuenta) return res.status(400).json({message: "No existe cuenta asociada a dicho CBU"})
-
-        return res.json(cuenta.cliente.nombre)
-    },
-
-    transferir: async(req, res) => {
-        const {tarjetaNro, cbuDestino, monto} = req.body
-        console.log(tarjetaNro, cbuDestino, monto)
-        
-        if (!tarjetaNro || !cbuDestino || !monto) 
+        // Comprobación de parámetros presentes
+        if (!tarjetaId || !cbuDestino || !monto){
             return res.status(400).json({message: "Parametros no especificados"})
+        }
 
+        const cuentaOrigen = await cuentaModel.findOne({tarjeta: tarjetaId})
         const cuentaDestino = await cuentaModel.findOne({cbu: cbuDestino})
-        const tarjetaOrigen = await cardModel.findOne({nro: tarjetaNro})
-        const cuentaOrigen = await cuentaModel.findOne({tarjeta: tarjetaOrigen._id})
 
         // Verificar si las cuentas coinciden
         if (cuentaOrigen.cbu.toString() == cbuDestino){
-            return res.status(400).json({message: "CBU destino es igual a origen"})
+            return res.status(400).json({message: "CBU origen y destino coinciden"})
         }
 
         // Verificar si no excede saldo actual en origen
         if (cuentaOrigen.monto < monto){
-            return res.status(400).json({message: "Saldo insuficiente en cuenta"})
+            return res.status(400).json({message: "Saldo insuficiente en cuenta origen"})
         }
 
         // Actualizar cuentas

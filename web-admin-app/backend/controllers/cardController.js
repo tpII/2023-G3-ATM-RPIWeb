@@ -37,8 +37,6 @@ const controller = {
         // También creamos la cuenta asociada
         const lastCBU = await cuentaModel.find({}, "cbu -_id").sort({ cbu: -1}).limit(1)
         const nuevoCBU = lastCBU ? (lastCBU[0].cbu + 1) : 1
-
-        console.log(lastCBU, nuevoCBU)
  
         const nuevaCuenta = new cuentaModel({
             cliente: clienteSeleccionado,
@@ -52,13 +50,15 @@ const controller = {
         res.json(savedCard);
     },
 
-    // Inserta una tarjeta con los datos elementales (desde cajero)
+    // Busca la tarjeta asociada al número pasado por parámetro y devuelve el PIN junto al ID
     getPin: async(req, res) => {
         const nro = req.params.nro
-        if (!nro) return res.status(400).json({message: "Numero no especificado"})
+        if (!nro) return res.status(400).json({message: "Número no especificado"})
 
-        const pin = await model.findOne({nro: nro, ban: false}, 'pin -_id')
-        return pin ? res.json(pin) : res.status(400).json({message: "Tarjeta no encontrada"})
+        const tarjeta = await model.findOne({nro: nro})
+        if (!tarjeta) return res.status(400).json({message: "Tarjeta no registrada en el sistema"})
+        if (tarjeta.ban) return res.status(400).json({message: "La tarjeta se encuentra bloqueada"})
+        return res.json({pin: tarjeta.pin, tarjetaId: tarjeta.id})
     },
 
     // Setea en true el campo "ban" de la tarjeta indicada por id
@@ -97,10 +97,12 @@ const controller = {
         const card = await model.findById(id)
         if (!card) return res.status(400).json({message: "ID no encontrado en la base de datos"})
 
-        const result1 = await card.deleteOne()
+        // Borrar también la cuenta asociada (si existe)
         const cuenta = await cuentaModel.findOne({tarjeta: id})
-        const result2 = await cuenta.deleteOne()
-        return (result1 && result2) ? res.json(result) : res.status(400).json({message: "Error al borrar"}) 
+        if (cuenta) await cuenta.deleteOne()
+
+        const result = await card.deleteOne()
+        return result ? res.json(result) : res.status(400).json({message: "Error al borrar"}) 
     }
 }
 

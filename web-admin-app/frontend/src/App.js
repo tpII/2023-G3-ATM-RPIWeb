@@ -9,9 +9,9 @@ import AddCardPage from "./cards/AddCardPage";
 import UserListPage from "./users/UserListPage";
 import AddUserPage from "./users/AddUserPage";
 import MoveListPage from "./moves/MoveListPage";
+import AccountListPage from "./accounts/AccountListPage"
 import SettingsPage from "./settings/SettingsPage"
 import Page404 from "./error/Page404";
-import AddMovePage from "./moves/AddMovePage";
 
 // estilos
 import "./App.css";
@@ -50,13 +50,13 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/users" element={<UserListPage darkMode={darkMode} />} />
           <Route path="/cards" element={<CardListPage darkMode={darkMode} />} />
-          <Route path="/moves" element={<MoveListPage darkMode={darkMode} />} />
+          <Route path="/moves" element={<MoveListPage />} />
+          <Route path="/accounts" element={<AccountListPage />} />
           <Route path="/settings" element={<SettingsPage />} />
 
           {/* Formularios */}
           <Route path="/users/add" element={<AddUserPage />} />
           <Route path="/cards/add" element={<AddCardPage />} />
-          <Route path="/moves/add" element={<AddMovePage />} />
 
           {/* Otros */}
           <Route path="/settings" element={<SettingsPage/>} />

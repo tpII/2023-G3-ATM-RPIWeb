@@ -1,5 +1,6 @@
-from Preferencias import LimitesConfig
+from preferencias import LimitesConfig, CashPreference
 from Estados import Estados
+from sesion import Sesion
 import Constantes
 
 # Constantes
@@ -7,25 +8,15 @@ STATE_PAGES = ["menu", "waiting-card", "pin-ack", "pin-input",
                "option-saldo", "option-ingreso", "option-retiro", "option-move",
                "error"]
 
-class Sesion():
-
-    # Constructor
-    def __init__(self, id, text):
-        self.id = id
-        self.text = text
-        self.pin = -1
-        self.pin_respondido = False
-        self.auth = False
-
 class MEF():
     
     # Constructor
     def __init__(self):
         self.current_state = Estados.ESPERANDO_TARJETA
         self.limites = LimitesConfig()
+        self.efectivo = CashPreference()
         self.times_in_state = 0
         self.attempts = 0
-        self.efectivo = 2000
         self.montoCuenta = -1
         self.montoDiff = -1
         self.cbu = -1
@@ -34,13 +25,18 @@ class MEF():
     def start(self, lectorRfid, clienteMqtt):
         self.lectorRfid = lectorRfid
         self.clienteMqtt = clienteMqtt
-        self.clienteMqtt.publish(Constantes.STATUS_TOPIC, "1", retain=True)
-        self.clienteMqtt.publish(Constantes.CASH_TOPIC, str(self.efectivo), retain=True)
         self.limites.cargar()
+        self.efectivo.cargar()
+
+        # Publicar estado, efectivo y límites de extracción cargados
+        self.clienteMqtt.publish(Constantes.STATUS_TOPIC, "1", retain=True)
+        self.clienteMqtt.publish(Constantes.CASH_TOPIC, self.efectivo.get_for_publish(), retain=True)
+        self.clienteMqtt.publish(Constantes.LIMITES_TOPIC, self.limites.get_for_publish())
 
     def stop(self):
         self.clienteMqtt.publish(Constantes.STATUS_TOPIC, "0", retain=True)
         self.limites.guardar()
+        self.efectivo.guardar()
 
     def changeToState(self, newState):
         self.current_state = newState
@@ -67,7 +63,7 @@ class MEF():
             if self.sesion.pin_respondido:
                 if self.sesion.pin == -1:
                     self.changeToState(Estados.ERROR)
-                    self.message = "La tarjeta no está registrada o habilitada en el sistema"
+                    self.message = self.sesion.error
                 else:
                     self.changeToState(Estados.INGRESO_PIN)
             elif self.times_in_state == 5:
@@ -101,7 +97,7 @@ class MEF():
             if entry_x == 1:
                 self.changeToState(Estados.MENU)
             elif entry_x == 2:
-                self.clienteMqtt.publish(Constantes.MONTO_REQUEST_TOPIC, self.sesion.id)
+                self.clienteMqtt.publish(Constantes.MONTO_REQUEST_TOPIC, self.sesion.card_database_id)
 
                 # Esperar respuesta del backend
                 while self.montoCuenta == -1:
@@ -119,7 +115,7 @@ class MEF():
             if entry_x == 1:
                 self.changeToState(Estados.MENU)
             elif entry_x == 2:
-                self.clienteMqtt.publish(Constantes.INGRESO_REQUEST_TOPIC, str(self.sesion.id) + "-" + str(self.montoDiff))
+                self.clienteMqtt.publish(Constantes.INGRESO_REQUEST_TOPIC, str(self.sesion.card_database_id) + "-" + str(self.montoDiff))
 
                 # Esperar respuesta del backend
                 while self.montoCuenta == -1:
@@ -132,8 +128,8 @@ class MEF():
                 else:
                     self.success = 1
                     self.message = self.montoCuenta
-                    self.efectivo = self.efectivo + self.montoDiff
-                    self.clienteMqtt.publish(Constantes.CASH_TOPIC, str(self.efectivo), retain=True)
+                    self.efectivo.sumar(self.montoDiff)
+                    self.clienteMqtt.publish(Constantes.CASH_TOPIC, self.efectivo.get_for_publish(), retain=True)
 
         elif (self.current_state == Estados.RETIRO_DINERO):
             if entry_x == 1:
@@ -142,7 +138,7 @@ class MEF():
                 self.success = 0
 
                 # Control de limites
-                if (self.montoDiff > self.efectivo):
+                if (self.montoDiff > self.efectivo.valor):
                     self.message = "No hay dinero suficiente en el cajero. Disculpe las molestias"
                 elif (self.montoDiff < self.limites.extraccion_min):
                     self.message = f"El monto mínimo para extraer es ${self.limites.extraccion_min}"
@@ -150,7 +146,7 @@ class MEF():
                     self.message = f"El monto máximo para extraer es ${self.limites.extraccion_max}"
                 else:
                     # Publicacion MQTT
-                    self.clienteMqtt.publish(Constantes.RETIRO_REQUEST_TOPIC, str(self.sesion.id) + "-" + str(self.montoDiff))
+                    self.clienteMqtt.publish(Constantes.RETIRO_REQUEST_TOPIC, str(self.sesion.card_database_id) + "-" + str(self.montoDiff))
 
                     # Esperar respuesta del backend
                     while self.montoCuenta == -1:
@@ -162,30 +158,30 @@ class MEF():
                     else:
                         self.success = 1
                         self.message = self.montoCuenta
-                        self.efectivo = self.efectivo - self.montoDiff
-                        self.clienteMqtt.publish(Constantes.CASH_TOPIC, str(self.efectivo), retain=True)
+                        self.efectivo.restar(self.montoDiff)
+                        self.clienteMqtt.publish(Constantes.CASH_TOPIC, self.efectivo.get_for_publish(), retain=True)
 
         elif (self.current_state == Estados.TRANSFERENCIA):
             if entry_x == 1:
                 self.changeToState(Estados.MENU)
             elif entry_x == 2:
-                self.clienteMqtt.publish(Constantes.CBU_REQUEST_TOPIC, str(self.cbu))
+                self.clienteMqtt.publish(Constantes.CBU_REQUEST_TOPIC, str(self.sesion.card_database_id) + "-" + str(self.cbu))
 
                 # Esperar respuesta del backend
                 while self.message == "":
                     pass
 
                 # En caso de error, backend responde "-2"
-                if (self.message == "-2"):
+                if (self.message.startswith("-")):
                     self.success = 0
-                    self.message = "El CBU no corresponde a un cliente en el sistema"
+                    self.message = self.message[1:]
                 else:
                     self.success = 1
 
             elif entry_x == 3:
-                self.clienteMqtt.publish(Constantes.TRANSFER_REQUEST_TOPIC, str(self.sesion.id) + "-" + str(self.cbu) + "-" + str(self.montoDiff))
+                self.clienteMqtt.publish(Constantes.TRANSFER_REQUEST_TOPIC, str(self.sesion.card_database_id) + "-" + str(self.cbu) + "-" + str(self.montoDiff))
 
-                # Eperar respuesta del backend
+                # Esperar respuesta del backend
                 while self.montoCuenta == -1:
                     pass
 

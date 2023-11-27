@@ -138,6 +138,17 @@ tr:last-of-type td:last-of-type {
   gap: 10px;
 }
 
+#edit-btn {
+  scale: 1;
+  background-color: green;
+  color: white;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  width: 100px;
+  gap: 10px;
+}
+
 .fail-page {
   margin-top: 40px;
   display: flex;
