@@ -50,12 +50,6 @@ const controller = {
         return doc ? res.json({monto: doc.monto}) : res.status(400).json({message: "Error al actualizar monto"})
     },
 
-    // Devuelve el próximo CBU disponible para crear una nueva cuenta
-    getLastCBU: async(req, res) => {
-        const lastCBU = await model.find().sort({ cbu: -1}).limit(1)
-        return lastCBU ? res.json({cbu: lastCBU}) : res.json({cbu: 0})
-    },
-
     // A partir de un CBU, devuelve el nombre del cliente asociado
     getCbuInfo: async(req, res) => {
         const tarjetaId = req.params.tarjetaId
