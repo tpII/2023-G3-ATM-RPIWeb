@@ -11,7 +11,7 @@ const controller = {
   },
 
   // Devuelve todos los usuarios registrados
-  getUsers: async (req, res) => {
+  getAll: async (req, res) => {
     // Usando aggregate() en lugar de find(), se puede realizar un "join" entre colecciones
     users = await model.aggregate().lookup({
         from: 'tarjetas',

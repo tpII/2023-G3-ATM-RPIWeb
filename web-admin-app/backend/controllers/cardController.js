@@ -12,7 +12,7 @@ const controller = {
     },
 
     // Devuelve todas las tarjetas registradas
-    getCards: async(req, res) => {
+    getAll: async(req, res) => {
         cards = await model.find();
         res.json({tarjetas: cards});
     },

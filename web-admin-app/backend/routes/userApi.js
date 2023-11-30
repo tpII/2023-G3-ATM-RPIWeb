@@ -6,7 +6,7 @@ const controller = require('../controllers/userController');
 
 // Definir rutas para las operaciones CRUD
 router.get('/count', controller.getCount)
-router.get('/all', controller.getUsers)
+router.get('/all', controller.getAll)
 router.post('/adduser', controller.postUser)
 router.delete('/delete/:id', controller.deleteUser)
 
