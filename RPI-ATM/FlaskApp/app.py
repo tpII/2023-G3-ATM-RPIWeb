@@ -132,7 +132,6 @@ def api_transferir():
     data = request.get_json()
     mef.montoDiff = data['monto']
     mef.update(entry_x=3)
-    print(mef.success, mef.montoCuenta)
     return jsonify(success=mef.success, msg=mef.montoCuenta)
 
 @app.route("/api/monto")
@@ -147,7 +146,7 @@ def onReceiveMqttMessage(mosq, obj, msg):
 
 # ---- TAREAS DE SEGUNDO PLANO -------------------
 
-def backgroundLoop():
+def backgroundTasks():
     # Setup 
     lectorRfid = SimpleMFRC522()
 
@@ -170,7 +169,7 @@ def backgroundLoop():
 # -------------------------------------------------
 
 if __name__ == "__main__":
-    backgroundThread = threading.Thread(target=backgroundLoop, daemon=True)
+    backgroundThread = threading.Thread(target=backgroundTasks, daemon=True)
     backgroundThread.start()
 
     # Hacerlo accesible desde otros dispositivos

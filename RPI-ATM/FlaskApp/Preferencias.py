@@ -48,7 +48,7 @@ class CashPreference():
     filename = "config_efectivo.txt"
 
     def __init__(self):
-        self.valor = 2000
+        self.efectivo = 2000
 
     # Recupera el valor actual. Si el archivo no existe, se genera y se guarda el valor por defecto
     def cargar(self):
@@ -58,7 +58,7 @@ class CashPreference():
 
         try:
             with open(self.filename, 'r') as file:
-                self.valor = int(file.readline())
+                self.efectivo = int(file.readline())
                 file.close()
         except Exception as e:
             print("Error al cargar efectivo desde txt:", e)
@@ -67,16 +67,16 @@ class CashPreference():
     def guardar(self):
         try:
             with open(self.filename, 'w') as file:
-                file.write(str(self.valor))
+                file.write(str(self.efectivo))
                 file.close()
         except Exception as e:
             print("Error al guardar efectivo en txt:", e)
 
     def sumar(self, diff):
-        self.valor = self.valor + diff
+        self.efectivo = self.efectivo + diff
     
     def restar(self, diff):
-        self.valor = self.valor - diff
+        self.efectivo = self.efectivo - diff
         
     def get_for_publish(self) -> str:
-        return str(self.valor)
+        return str(self.efectivo)

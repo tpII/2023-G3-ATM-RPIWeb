@@ -138,7 +138,7 @@ class MEF():
                 self.success = 0
 
                 # Control de limites
-                if (self.montoDiff > self.efectivo.valor):
+                if (self.montoDiff > self.efectivo.efectivo):
                     self.message = "No hay dinero suficiente en el cajero. Disculpe las molestias"
                 elif (self.montoDiff < self.limites.extraccion_min):
                     self.message = f"El monto mínimo para extraer es ${self.limites.extraccion_min}"

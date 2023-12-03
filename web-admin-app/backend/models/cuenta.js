@@ -11,6 +11,6 @@ const schema = new mongoose.Schema({
 });
 
 // Crea un modelo a partir del esquema
-const Cuenta = mongoose.model("Cuentas", schema);
+const Cuenta = mongoose.model("Cuenta", schema);
 
 module.exports = Cuenta;
