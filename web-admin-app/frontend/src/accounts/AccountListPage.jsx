@@ -8,7 +8,6 @@ import "./styles.css";
 // otros componentes
 import PageHeader from "../common/PageHeader";
 import Loading from "../common/Loading";
-import EditButton from "../common/EditButton";
 
 const AccountListPage = () => {
   const [loading, setLoading] = useState(true);

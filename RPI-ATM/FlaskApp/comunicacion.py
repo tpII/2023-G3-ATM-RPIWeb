@@ -8,6 +8,7 @@ class Suscriptor():
 
     def suscribir_topicos(self, cliente):
         cliente.subscribe(Constantes.LIMITES_TOPIC)
+        cliente.subscribe(Constantes.CASH_TOPIC)
         cliente.subscribe(Constantes.PIN_RESPONSE_TOPIC)
         cliente.subscribe(Constantes.MONTO_RESPONSE_TOPIC)
         cliente.subscribe(Constantes.INGRESO_RESPONSE_TOPIC)
@@ -23,6 +24,9 @@ class Suscriptor():
             self.mef.limites.extraccion_min = int(parts[0])
             self.mef.limites.extraccion_max = int(parts[1])
             self.mef.limites.guardar()
+
+        elif topic == Constantes.CASH_TOPIC:
+            self.mef.efectivo.efectivo = Utils.try_parseInt(payload)
         
         elif topic == Constantes.PIN_RESPONSE_TOPIC:
             # payload: PIN-ID o caracter "-" seguido del mensaje de error

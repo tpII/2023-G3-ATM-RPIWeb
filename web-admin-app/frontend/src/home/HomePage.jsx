@@ -1,6 +1,7 @@
 import DashboardCard from "./DashboardCard";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import Modal from "react-modal"
 import io from 'socket.io-client'
 import miApi from "..";
 
@@ -22,6 +23,10 @@ function HomePage() {
   const [cardCount, setCardCount] = useState(0)
   const [moveCount, setMoveCount] = useState(0)
   const [accountCount, setAccountCount] = useState(0)
+
+  // Modal
+  const [modalOpen, setModalOpen] = useState(false)
+  const [modalCash, setModalCash] = useState(0.0)
 
   useEffect(() => {
     // Obtener cantidades desde la database
@@ -57,13 +62,38 @@ function HomePage() {
 
   }, []);
 
+  const closeModal = () => {
+    setModalOpen(false)
+  }
+
+  const handleCashSubmit = (e) => {
+    e.preventDefault()
+    closeModal()
+
+    // Informar nuevo efectivo al backend
+    miApi.post("cash", {value: modalCash})
+      .then(res => alert("Efectivo actualizado"))
+      .catch(err => alert(err?.response?.data?.message))
+  }
+
+  const modalStyles = {
+    content: {
+      top: '50%',
+      left: '50%',
+      right: 'auto',
+      bottom: 'auto',
+      marginRight: '-50%',
+      transform: 'translate(-50%, -50%)',
+    },
+  };
+
   return (
     <main className="home">
       <h1 id="titulo-cajero">Estado del cajero</h1>
 
       {/* Si el cajero está en servicio, mostrar efectivo */}
       {status ? <div className="cash">
-        <div className="circular-btn edit">
+        <div className="circular-btn edit" onClick={(e) => setModalOpen(true)}>
           <img src={edit} alt="Editar" />
         </div>
 
@@ -111,6 +141,19 @@ function HomePage() {
           count={accountCount}
         />
       </div>
+
+      <Modal 
+        isOpen={modalOpen} 
+        onRequestClose={closeModal} 
+        style={modalStyles}
+      >
+        <h2>Modificar efectivo</h2>
+        <form onSubmit={handleCashSubmit}>
+          <input type="number" onChange={(e) => setModalCash(e.target.value)} required></input>
+          <button type="submit">Aplicar</button>
+        </form>
+      </Modal>
+
     </main>
   );
 }
