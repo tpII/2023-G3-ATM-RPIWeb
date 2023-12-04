@@ -52,17 +52,9 @@ function AddCardPage() {
       cvv: parseInt(cvv),
     };
 
-    miApi
-      .post("cards/addcard", nuevaTarjeta)
-      .then(navigate("/cards", { replace: true }))
-      .catch((err) => alert("Error al agregar tarjeta - " + err));
-
-    // Limpia los campos después de enviar
-    setNro("");
-    setPin("");
-    setFechavto("");
-    setCvv("");
-    setClienteSeleccionado("");
+    miApi.post("cards/addcard", nuevaTarjeta)
+      .then(res => navigate("/cards", { replace: true }))
+      .catch((err) => alert(err.response?.data?.message));
   };
 
   const handleChangeCliente = (e) => {

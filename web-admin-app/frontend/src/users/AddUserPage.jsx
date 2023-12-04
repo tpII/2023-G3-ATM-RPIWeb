@@ -17,7 +17,7 @@ function AddUserPage() {
     const nuevoUsuario = { nombre };
 
     miApi.post("users/adduser", nuevoUsuario)
-      .then(navigate("/users", { replace: true }))
+      .then(res => navigate("/users", { replace: true }))
       .catch(err => alert("Error al agregar usuario - " + err))
 
     // Limpia los campos después de enviar
