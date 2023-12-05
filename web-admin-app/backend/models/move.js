@@ -9,6 +9,6 @@ const schema = new mongoose.Schema({
 });
 
 // Crea un modelo a partir del esquema
-const Move = mongoose.model("Transacciones", schema);
+const Move = mongoose.model("Transferencia", schema);
 
 module.exports = Move;

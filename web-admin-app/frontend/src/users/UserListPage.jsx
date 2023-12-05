@@ -36,7 +36,7 @@ function UserListPage(props) {
   const deleteFn = (userId) => {
     miApi
       .delete(`/users/delete/${userId}`)
-      .then((_) => {
+      .then(res => {
         alert("Usuario eliminado con éxito");
         getAllFn();
       })

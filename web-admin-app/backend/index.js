@@ -46,7 +46,7 @@ webSocketConfig();
 
 // Middleware
 app.use((req, res, next) => {
-  console.log("API Request: ", req.url);
+  console.log("API Request: ", req.url, req.method);
   next();
 });
 
@@ -57,14 +57,23 @@ app.use("/api/moves", moveApi);
 app.use("/api/cuentas", cuentaApi);
 
 // APIs MQTT
-app.use("/api/status", (req, res) => res.json({value: cajero_activo}))
-app.use("/api/cash", (req, res) => res.json({ value: efectivo }))
+app.get("/api/status", (req, res) => res.json({value: cajero_activo}))
+app.get("/api/cash", (req, res) => res.json({ value: efectivo }))
 
 // Carga de límites de extracción
 app.get("/api/settings/limites", (req, res) => res.json({
   min: limites_extraccion[0],
   max: limites_extraccion[1]
 }))
+
+// Modificación de efectivo al cajero
+app.post("/api/cash", (req, res) => {
+  const value = req.body.value
+  if (!value) return res.status(400).json({message: "Valor no especificado"})
+  if (!mqttClient) return res.status(400).json({message: "Cliente MQTT no inicializado"})
+  mqttClient.publish("cajero/efectivo", value.toString())
+  return res.status(200).json({message: "Efectivo actualizado"})
+})
 
 // Envío de nuevos límites de extracción
 app.post("/api/settings/limites", (req, res) => {

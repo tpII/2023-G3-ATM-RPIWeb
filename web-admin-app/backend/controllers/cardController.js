@@ -22,11 +22,15 @@ const controller = {
         const {clienteSeleccionado, nro, pin, fechavto,cvv} = req.body
 
         // Control de parámetros
-        if (!clienteSeleccionado) return res.status(404).json({message:"Cliente no especificado"});
+        if (!clienteSeleccionado) return res.status(400).json({message:"Cliente no especificado"});
+    
+        // Si existe una tarjeta con el mismo número, se cancela la operación
+        const existsNumber = await model.findOne({nro: nro})
+        if (existsNumber) return res.status(400).json({message: "Número de tarjeta ya utilizado"})
 
         const newCard = new model({
             cliente:clienteSeleccionado,
-            nro:nro, //es el numero parseado de la raspberry pi
+            nro:nro,
             pin:pin,
             fechavto:fechavto,
             cvv: cvv,
@@ -36,7 +40,7 @@ const controller = {
         
         // También creamos la cuenta asociada
         const lastCBU = await cuentaModel.find({}, "cbu -_id").sort({ cbu: -1}).limit(1)
-        const nuevoCBU = lastCBU ? (lastCBU[0].cbu + 1) : 1
+        const nuevoCBU = lastCBU.length ? (lastCBU[0].cbu + 1) : 1
  
         const nuevaCuenta = new cuentaModel({
             cliente: clienteSeleccionado,

@@ -35,12 +35,14 @@
   margin-top: 10px;
   margin-left: 0;
   margin-right: 0;
+  margin-bottom: 10px;
 }
 
 .home .cash .circular-btn {
   background-color: var(--primary);
   border-radius: 20px;
-  margin-bottom: 20px;
+  margin-top: 5px;
+  margin-bottom: 0px;
   cursor: pointer;
 }
 

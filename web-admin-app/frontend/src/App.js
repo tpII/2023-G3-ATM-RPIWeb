@@ -52,7 +52,6 @@ function App() {
           <Route path="/cards" element={<CardListPage darkMode={darkMode} />} />
           <Route path="/moves" element={<MoveListPage />} />
           <Route path="/accounts" element={<AccountListPage />} />
-          <Route path="/settings" element={<SettingsPage />} />
 
           {/* Formularios */}
           <Route path="/users/add" element={<AddUserPage />} />
